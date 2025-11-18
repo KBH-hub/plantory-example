@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: Alert_test
+server:
+  port: 5454
+solapi:
+  api-key: #api-key ?? ??
+  api-secret: #api-secret ?? ??

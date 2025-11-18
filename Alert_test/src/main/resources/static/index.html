@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Solapi 문자 전송 테스트</title>
+</head>
+<body>
+<h1>Solapi 문자 전송</h1>
+
+<form id="smsForm">
+    <div>
+        <label for="to">수신번호(to)</label>
+        <input type="text" id="to" name="to" placeholder="01012345678" required>
+    </div>
+    <div>
+        <label for="from">발신번호(from)</label>
+        <input type="text" id="from" name="from" placeholder="021234567" required>
+    </div>
+    <div>
+        <label for="text">내용(text)</label><br>
+        <textarea id="text" name="text" rows="4" cols="40" placeholder="Solapi 테스트 문자입니다." required></textarea>
+    </div>
+    <button type="submit">문자 전송</button>
+</form>
+
+<hr>
+
+<h3>응답 결과</h3>
+<pre id="result"></pre>
+
+<script>
+    const form = document.getElementById('smsForm');
+    const resultEl = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // 폼 기본 동작(페이지 이동) 막기
+
+        const to = document.getElementById('to').value.trim();
+        const from = document.getElementById('from').value.trim();
+        const text = document.getElementById('text').value.trim();
+
+        const payload = {
+            to: to,
+            from: from,
+            text: text
+        };
+
+        try {
+            const response = await fetch('/sms/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json().catch(() => response.text());
+
+            resultEl.textContent =
+                'HTTP ' + response.status + ' ' + response.statusText + '\n\n' +
+                (typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+        } catch (err) {
+            resultEl.textContent = '요청 중 오류 발생:\n' + err;
+        }
+    });
+</script>
+</body>
+</html>
