@@ -75,7 +75,7 @@
                         <h5 class="fw-bold mb-1">이쁜 몬스테라 나눔요~</h5>
                         <div class="text-muted small">23분 전</div>
                     </div>
-
+                    <hr>
                     <div class="text-muted small mb-2">
                         식물 종류: <span class="text-dark">몬스테라</span>
                         <span class="mx-2">|</span>
@@ -84,44 +84,65 @@
                         관리난이도: <span class="text-dark">쉬움</span>
                     </div>
 
-                    <div class="border rounded p-2 bg-white">
+                    <div class="p-2 bg-white">
                         <p class="mb-1">대형몬스테라 무료 나눔합니다!</p>
                         <p class="mb-1">이사로 인해 부득이하게 놓고 갑니다!</p>
                         <p class="mb-1">픽업 위치: 서울 강남구 개포동 203동</p>
                         <p class="mb-0">가능 시간: 주말 오후 2~6시</p>
                     </div>
-
-                    <div class="d-flex align-items-center mt-3">
-                        <div class="mx-auto">
-                            <a href="/sharingUpdate" class="btn btn-primary px-4 me-2">수정</a>
-                            <button class="btn btn-danger px-4">삭제</button>
-                        </div>
-                        <div class="ms-auto">
-                            <button class="btn btn-success px-4">나눔 완료</button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <hr class="my-3">
+            <div class="my-3">
 
             <div class="d-flex align-items-center">
                 <div class="me-3"><div class="bg-secondary rounded-circle" style="width:48px;height:48px;"></div></div>
                 <div class="flex-grow-1">
                     <div class="d-flex align-items-center gap-2">
                         <span class="fw-semibold">닉네임</span>
-                        <span class="badge text-bg-success d-inline-flex align-items-center">
-              <i class="bi bi-leaf me-1"></i> 5.0 / 5.0
-            </span>
                     </div>
-                    <div class="text-muted small">서울특별시 강남구 · 가입 1년차</div>
                 </div>
-                <button class="btn btn-outline-secondary btn-sm">쪽지</button>
+                <div class="d-flex align-items-center mt-3">
+                    <div class="d-flex align-items-center mt-3 justify-content-end gap-3 flex-wrap">
+                        <a href="/sharingUpdate" class="btn btn-primary px-4">수정</a>
+                        <button class="btn btn-danger px-4">삭제</button>
+                        <button class="btn btn-success px-4">나눔 완료</button>
+                    </div>
+                </div>
             </div>
 
             <hr class="my-3">
 
             <div class="mb-2 text-muted small">댓글</div>
+                <ul class="list-group mt-3">
+                    <li class="list-group-item">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="fw-semibold">모니모니</span>
+                                    <small class="text-muted">방금</small>
+                                </div>
+                                <p class="mb-0 mt-1">화분 포함인가요? 위치 확인했습니다. 대기줄 가능하면 신청합니다.</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="fw-semibold">닉네임</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <a href="#" class="link-secondary small">수정</a>
+                                        <span class="text-secondary">·</span>
+                                        <a href="#" class="link-secondary small">삭제</a>
+                                        <small class="text-muted ms-2">1분 전</small>
+                                    </div>
+                                </div>
+                                <p class="mb-0 mt-1">화분 포함입니다~</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="댓글을 입력하세요.">
                 <button class="btn btn-secondary">등록</button>

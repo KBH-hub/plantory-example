@@ -56,6 +56,11 @@ public class CmdController {
         return "sharingDetail";
     }
 
+    @RequestMapping("/sharingDetail-other")
+    public String sharingDetailOther(){
+        return "sharingDetail-other";
+    }
+
     @RequestMapping("/dashboard")
     public String dashboard(){
         return "dashboard";

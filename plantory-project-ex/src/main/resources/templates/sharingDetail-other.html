@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Plantory - 나눔 게시글 상세(타인)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .share-image-fixed{width:100%;aspect-ratio:4/3;object-fit:cover;max-height:180px}
+        @media (min-width:768px){.share-image-fixed{max-height:300px}}
+        .carousel-control-prev,.carousel-control-next{width:7%}
+        .carousel-control-prev-icon,.carousel-control-next-icon{filter:drop-shadow(0 1px 3px rgba(0,0,0,.45))}
+        .share-image-wrap{border-radius:.5rem;overflow:hidden}
+    </style>
+</head>
+<body class="bg-light">
+
+<div th:replace="fragments/header :: headerBar"></div>
+
+<div class="container my-4">
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div id="shareCarouselGuest" class="carousel slide share-image-wrap" data-bs-ride="false">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="https://picsum.photos/seed/plant1/800/600" class="d-block w-100 share-image-fixed" alt="대표 이미지">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="https://picsum.photos/seed/plant2/800/600" class="d-block w-100 share-image-fixed" alt="추가 이미지 1">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="https://picsum.photos/seed/plant3/800/600" class="d-block w-100 share-image-fixed" alt="추가 이미지 2">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#shareCarouselGuest" data-bs-slide="prev" aria-label="이전 이미지">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#shareCarouselGuest" data-bs-slide="next" aria-label="다음 이미지">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="carousel-indicators m-0">
+                            <button type="button" data-bs-target="#shareCarouselGuest" data-bs-slide-to="0" class="active" aria-label="1"></button>
+                            <button type="button" data-bs-target="#shareCarouselGuest" data-bs-slide-to="1" aria-label="2"></button>
+                            <button type="button" data-bs-target="#shareCarouselGuest" data-bs-slide-to="2" aria-label="3"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="fw-bold mb-1">이쁜 몬스테라 나눔요~</h5>
+                        <div class="text-muted small">23분 전</div>
+                    </div>
+                    <hr>
+                    <div class="text-muted small mb-2">
+                        식물 종류: <span class="text-dark">몬스테라</span>
+                        <span class="mx-2">|</span>
+                        상태: <span class="text-dark">양호</span>
+                        <span class="mx-2">|</span>
+                        관리난이도: <span class="text-dark">쉬움</span>
+                    </div>
+                    <div class="p-2 bg-white">
+                        <p class="mb-1">대형몬스테라 무료 나눔합니다!</p>
+                        <p class="mb-1">이사로 인해 부득이하게 놓고 갑니다!</p>
+                        <p class="mb-1">픽업 위치: 서울 강남구 개포동 203동</p>
+                        <p class="mb-0">가능 시간: 주말 오후 2~6시</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 작성자 + 타인 액션 -->
+            <div class="my-3">
+                <div class="d-flex align-items-center">
+                    <div class="me-3"><div class="bg-secondary rounded-circle" style="width:48px;height:48px;"></div></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-semibold">김민수</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mt-3 justify-content-end gap-3 flex-wrap">
+                        <button class="btn btn-outline-danger px-4">관심</button>
+                        <a href="/message/new?to=writerId" class="btn btn-success px-4">쪽지 보내기</a>
+                    </div>
+                </div>
+
+                <hr class="my-3">
+
+                <div class="mb-2 text-muted small">댓글</div>
+                <ul class="list-group mt-3">
+                    <!-- 새 샘플(실명 + 텍스트 수정/삭제) -->
+                    <li class="list-group-item">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="fw-semibold">닉네임</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <a href="#" class="link-secondary small">수정</a>
+                                        <span class="text-secondary">·</span>
+                                        <a href="#" class="link-secondary small">삭제</a>
+                                        <small class="text-muted ms-2">1분 전</small>
+                                    </div>
+                                </div>
+                                <p class="mb-0 mt-1">저녁 7시 픽업 가능할까요?</p>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="fw-semibold">모니모니</span>
+                                    <small class="text-muted">방금</small>
+                                </div>
+                                <p class="mb-0 mt-1">화분 포함인가요? 위치 확인했습니다. 대기줄 가능하면 신청합니다.</p>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="fw-semibold">김민수</span>
+                                    <small class="text-muted">방금</small>
+                                </div>
+                                <p class="mb-0 mt-1">화분 포함입니다~</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="input-group mt-2">
+                    <input type="text" class="form-control" placeholder="댓글을 입력하세요.">
+                    <button class="btn btn-secondary">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
