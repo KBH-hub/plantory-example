@@ -66,4 +66,14 @@ public class CmdController {
         return "dashboard";
     }
 
+    @RequestMapping("/messageList")
+    public String messageList(){
+        return "messageList";
+    }
+
+    @RequestMapping("/messageDetail")
+    public String messageDetail(){
+        return "messageDetail";
+    }
+
 }
