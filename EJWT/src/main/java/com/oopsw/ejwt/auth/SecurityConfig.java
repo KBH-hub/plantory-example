@@ -38,11 +38,12 @@ public class SecurityConfig {
             http.addFilter(corsFilter);
             http.addFilter(new JwtAuthenticationFilter(am)); // 기존에 적용된거 놔두고 내가 만든게 적용됨
 
+
             http.authorizeHttpRequests(ar ->
-//                ar.requestMatchers("/api/jwt/user/**").authenticated()
-//                        .requestMatchers("/api/jwt/manager/**").hasAnyRole("ADMIN", "MANAGER") // admin, manager만 들어오게 함
-//                        .requestMatchers("/api/jwt/admin/**").hasAnyRole("ADMIN") // admin만 들어오게 함
-                    ar.anyRequest().permitAll());
+                    ar.requestMatchers("/api/jwt/user/**").authenticated()
+                            .requestMatchers("/api/jwt/manager/**").hasAnyRole("ADMIN", "MANAGER") // admin, manager만 들어오게 함
+                            .requestMatchers("/api/jwt/admin/**").hasAnyRole("ADMIN") // admin만 들어오게 함
+                            .anyRequest().permitAll());
         });
         return http.build();
     }
