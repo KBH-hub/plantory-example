@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: EJWT
+  security:
+    user:
+      name: admin
+      password: 1234
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://127.0.0.1:3306/mydb
+    username: mydbid
+    password: mydbpw
+  jpa:
+    open-in-view: false
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+server:
+  port: 8882
