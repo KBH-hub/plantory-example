@@ -1,6 +1,8 @@
 package com.oopsw.ejwt.auth;
 
 import com.oopsw.ejwt.jwt.JwtAuthenticationFilter;
+import com.oopsw.ejwt.jwt.JwtBasicAuthenticationFilter;
+import com.oopsw.ejwt.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,8 +26,9 @@ public class SecurityConfig {
         return ac.getAuthenticationManager();
     }
 
+    // 매번 메모리에 올릴 필요 X -> DI 필요한 상황 (실무에선 바뀔 수 있음)
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager am) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager am, UserRepository userRepository) throws Exception {
         http.csrf(csrf -> csrf.disable());
         // 세션을 사용하지 않음
         http.sessionManagement(session -> {
@@ -37,6 +40,7 @@ public class SecurityConfig {
             System.out.println("Security Config");
             http.addFilter(corsFilter);
             http.addFilter(new JwtAuthenticationFilter(am)); // 기존에 적용된거 놔두고 내가 만든게 적용됨
+            http.addFilter(new JwtBasicAuthenticationFilter(am, userRepository));
 
 
             http.authorizeHttpRequests(ar ->

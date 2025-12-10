@@ -62,8 +62,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
                 .withClaim("id", resultDetails.getUser().getId())
                 .withClaim("username", resultDetails.getUser().getUsername())
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
-//                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes())); // 문자열은 byte 배열로 되어있음
+//                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes())); // 문자열은 byte 배열로 되어있음
         System.out.println(jwtToken);
         //(4) 웹 브라우저에 전달
         response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken);
