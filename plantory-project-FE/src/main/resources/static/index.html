@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<h1>시작 페이지</h1>
+<div>
+    <h1>로그인</h1>
+    id: <input type="text" id="id"><br>
+    pw: <input type="password" id="pw"><br>
+    <button id="login">로그인</button>
+</div>
+<div>
+    <h2>로그인 이후 보여주는 메뉴</h2>
+    <a href="#" id="userCheck">user data</a><br>
+    <a href="#" id="managerCheck">manager data</a><br>
+    <a href="#" id="adminCheck">admin data</a><br>
+</div>
+<div id="message">
+    메뉴 누르면 변경되는 데이터 또는 디자인
+</div>
+<script>
+    function loginHandling(){
+        let id = document.querySelector("#id"); //element 형
+        let pw = document.querySelector("#pw");
+        // let id = document.querySelector("#id").value; //-> string 형으로 바뀜
+        // let pw = document.querySelector("#pw").value; //타입 스크립트의 필요성
+        //console.log(id, pw);
+        let message = 'OK';
+        axios.post('http://127.0.0.1:8882/login', {username: id.value, password: pw.value})
+            .then(response => { //ok 상황
+                // console.log(response.headers.authorization);
+                // 유지 - 1. 메모리, 2. 쿠키, 3. 다른 저장소 .....
+                sessionStorage.au = response.headers.authorization;
+                // localStorage.au = response.headers.authorization;
+            })
+            .catch( error => { //no 상황
+                message='login 실패';
+                console.log(error);
+            });
+        //로그인 UI 비활성화, 숨김 (핸들링 코드에 UI 코드 들어온 상황 -> 함수를 밖으로 빼는게 나음)
+        id.value="";
+        pw.value="";
+        document.querySelector('#message').innerHTML = message;
+    }
+    document.querySelector("#login").addEventListener("click", loginHandling);
+
+    function userCheckHandling(){
+        // alert('user');
+        axios.get('http://127.0.0.1:8882/api/jwt/user', {headers:{
+                Authorization : sessionStorage.au
+            }})
+            .then(response => {
+                // document.querySelector('#message').innerHTML = response;
+                // console.log(response);
+                document.querySelector('#message').innerHTML = response.data.message;
+            })
+            .catch( error => {
+                // console.log(error);
+                document.querySelector('#message').innerHTML = '로그인 필수';
+            });
+    }
+    document.querySelector("#userCheck").addEventListener("click", userCheckHandling);
+
+    function managerCheckHandling(){
+        // alert('manager');
+        axios.get('http://127.0.0.1:8882/api/jwt/manager', {headers:{
+                Authorization : sessionStorage.au
+            }})
+            .then(response => {
+                document.querySelector('#message').innerHTML = response.data.message;
+            })
+            .catch( error => {
+                document.querySelector('#message').innerHTML = '로그인 필수 - manager';
+            });
+    }
+
+    document.querySelector("#managerCheck").addEventListener("click", managerCheckHandling);
+
+    function adminCheckHandling(){
+        // alert('admin');
+        axios.get('http://127.0.0.1:8882/api/jwt/admin', {headers:{
+                Authorization : sessionStorage.au
+            }})
+            .then(response => {
+                document.querySelector('#message').innerHTML = response.data.message;
+            })
+            .catch( error => {
+                document.querySelector('#message').innerHTML = '로그인 필수 - admin';
+            });
+    }
+
+    document.querySelector("#adminCheck").addEventListener("click", adminCheckHandling);
+</script>
+</body>
+</html>
