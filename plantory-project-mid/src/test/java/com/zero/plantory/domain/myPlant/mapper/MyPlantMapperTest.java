@@ -1,0 +1,84 @@
+package com.zero.plantory.domain.myPlant.mapper;
+
+import com.zero.plantory.domain.myPlant.dto.MyPlantRequest;
+import com.zero.plantory.domain.myPlant.dto.MyPlantResponse;
+import com.zero.plantory.domain.myPlant.dto.MyPlantSearchNameResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+@SpringBootTest
+@Slf4j
+class MyPlantMapperTest {
+
+    @Autowired
+    MyPlantMapper myPlantMapper;
+
+    @Test
+    @DisplayName("나의 식물 관리 화면")
+    void selectMyPlantListTest() {
+        Long memberId = 20L;
+        String name = "";
+        int limit = 10;
+        int offset = 0;
+
+        List<MyPlantResponse> result = myPlantMapper.selectMyPlantList(memberId, name, limit, offset);
+
+        log.info("result={}", result);
+    }
+
+    @Test
+    @DisplayName("나의 식물 등록 처리")
+    void insertMyPlantTest() {
+        MyPlantRequest vo  = MyPlantRequest.builder()
+                .memberId(4L)
+                .myplantId(1L)
+                .name("테스트마이플랜트명")
+                .type("테스트마이플랜트타입")
+                .startAt(Timestamp.valueOf("2025-10-01 00:00:00").toLocalDateTime())
+                .endDate(Timestamp.valueOf("2025-11-01 00:00:00").toLocalDateTime())
+                .interval(28)
+                .soil("테스트마이플랜트비료")
+                .temperature("666~999℃")
+                .build();
+
+        int result = myPlantMapper.insertMyPlant(vo);
+
+        log.info(String.valueOf(result));
+    }
+
+    @Test
+    @DisplayName("나의 식물 수정 처리")
+    void updateMyPlantTest() {
+        MyPlantRequest vo  = MyPlantRequest.builder()
+                .memberId(4L)
+                .myplantId(20L)
+                .name("수정11테스트마이플랜트명")
+                .type("수정11테스트마이플랜트타입")
+                .startAt(Timestamp.valueOf("2025-10-01 00:00:00").toLocalDateTime())
+                .endDate(Timestamp.valueOf("2025-11-01 00:00:00").toLocalDateTime())
+                .interval(29)
+                .soil("테스트마이플랜트비료")
+                .temperature("666~999℃")
+                .build();
+
+        int result = myPlantMapper.updateMyPlant(vo);
+
+        log.info(String.valueOf(result));
+    }
+
+    @Test
+    @DisplayName("나의 식물 삭제")
+    void deleteMyPlantTest() {
+        Long myplantId = 2L;
+
+        int result = myPlantMapper.deletePlant(myplantId);
+
+        log.info(String.valueOf(result));
+    }
+}
