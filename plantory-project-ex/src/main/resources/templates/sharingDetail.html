@@ -34,6 +34,30 @@
             border-radius: .5rem;
             overflow: hidden;
         }
+         /* 높이 동결(고정) + 본문만 스크롤 */
+         .modal-fixed .modal-dialog{
+             max-width: 420px;             /* 폭도 통일(선택) */
+         }
+        .modal-fixed .modal-content{
+            height: 420px;                /* ← 원하는 고정 높이 */
+            display: flex;                /* 헤더/본문/푸터 수직 배치 */
+            flex-direction: column;
+        }
+        .modal-fixed .modal-header,
+        .modal-fixed .modal-footer{
+            flex: 0 0 auto;               /* 고정 높이 영역 */
+        }
+        .modal-fixed .modal-body{
+            flex: 1 1 auto;               /* 남은 공간 채우기 */
+            overflow: auto;               /* 내용 많아지면 내부 스크롤 */
+        }
+
+        /* 작은 화면에서는 화면높이 기반으로 안전하게 고정 */
+        @media (max-width: 575.98px){
+            .modal-fixed .modal-content{
+                height: calc(100dvh - 3rem); /* 상하 마진 감안 */
+            }
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -116,8 +140,13 @@
                     </div>
                     <div class="d-flex align-items-center mt-3 justify-content-end gap-3 flex-wrap">
                         <a href="/sharingUpdate" class="btn btn-primary px-4">수정</a>
+<<<<<<< HEAD
                         <a href="/sharingList" class="btn btn-danger px-4">삭제</a>
                         <button class="btn btn-success px-4">나눔 완료</button>
+=======
+                        <button class="btn btn-danger px-4">삭제</button>
+                        <button id="btnComplete" class="btn btn-success px-4">나눔 완료</button>
+>>>>>>> 71e2e6b6480fecfafcd40a0f6911d9fed24072d1
                     </div>
                 </div>
 
@@ -157,10 +186,173 @@
                     <input type="text" class="form-control" placeholder="댓글을 입력하세요.">
                     <button class="btn btn-secondary">등록</button>
                 </div>
+<<<<<<< HEAD
+=======
             </div>
         </div>
     </div>
 </div>
+<!-- 2) 모달 1: 나눔 완료 상대 선택 -->
+<div class="modal fade modal-fixed" id="modalSelectCounterpart" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-semibold">나눔 완료 상대 선택</h6>
+            </div>
+            <div class="modal-body">
+                <div class="small text-muted mb-2">이 글에 대해 마지막으로 나눈 상대</div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="doneTarget" id="opt1" value="식물왕이">
+                    <label class="form-check-label" for="opt1">식물왕이</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="doneTarget" id="opt2" value="나눠나나">
+                    <label class="form-check-label" for="opt2">나눠나나</label>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
+                <button id="btnSelectDone" class="btn btn-success"
+                        data-next="#modalConfirmDone"
+                        data-current="#modalSelectCounterpart" disabled>선택 완료</button>
+
+>>>>>>> 71e2e6b6480fecfafcd40a0f6911d9fed24072d1
+            </div>
+        </div>
+    </div>
+</div>
+<<<<<<< HEAD
+=======
+
+<!-- 3) 모달 2: 완료 확인 -->
+<div class="modal fade modal-fixed" id="modalConfirmDone" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-semibold">나눔 완료</h6>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">
+                    <strong id="confirmName" class="text-success"></strong>님과의 나눔을 종료하시겠습니까?
+                </p>
+                <small class="text-muted">(나눔 완료 후, 취소는 불가능합니다)</small>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button class="btn btn-secondary"
+                        data-back="#modalSelectCounterpart"
+                        data-current="#modalConfirmDone">취소</button>
+                <button class="btn btn-success"
+                        data-next="#modalDoneResult"
+                        data-current="#modalConfirmDone">나눔 완료</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4) 모달 3: 완료 안내 + 후기 유도 -->
+<div class="modal fade modal-fixed" id="modalDoneResult" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-semibold">나눔 완료 확인!</h6>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0"><strong id="resultName" class="text-success"></strong>님과의 나눔이 완료되었습니다.</p>
+                <small class="text-muted">후기를 남겨 서로의 나눔지수를 올려보세요!</small>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">닫기</button>
+                <a id="goReview" href="/review/write" class="btn btn-success">후기 작성하러 가기</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+>>>>>>> 71e2e6b6480fecfafcd40a0f6911d9fed24072d1
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+<script>
+    (function () {
+        const cache = new Map();
+        const getModal = (sel) => {
+            if (!cache.has(sel)) {
+                cache.set(sel, new bootstrap.Modal(document.querySelector(sel), {
+                    backdrop: 'static',
+                    keyboard: false
+                }));
+            }
+            return cache.get(sel);
+        };
+
+        const goNext = (currentSel, nextSel) => {
+            const currEl = document.querySelector(currentSel);
+            const next = getModal(nextSel);
+            const handler = () => {
+                currEl.removeEventListener('hidden.bs.modal', handler);
+                next.show();
+            };
+            currEl.addEventListener('hidden.bs.modal', handler, { once: true });
+            getModal(currentSel).hide();
+        };
+
+        const goBack = (currentSel, prevSel) => {
+            const currEl = document.querySelector(currentSel);
+            const prev = getModal(prevSel);
+            const handler = () => {
+                currEl.removeEventListener('hidden.bs.modal', handler);
+                prev.show();
+            };
+            currEl.addEventListener('hidden.bs.modal', handler, { once: true });
+            getModal(currentSel).hide();
+        };
+
+        /* ▶ 여기 추가: '나눔 완료' 버튼 → 1번 모달 오픈 */
+        document.getElementById('btnComplete')
+            .addEventListener('click', () => getModal('#modalSelectCounterpart').show());
+
+        // 라디오 선택 -> "선택 완료" 버튼 활성화
+        const radios = document.querySelectorAll('input[name="doneTarget"]');
+        const btnSelectDone = document.getElementById('btnSelectDone');
+        let selectedName = '';
+        radios.forEach(r => r.addEventListener('change', () => {
+            selectedName = r.value;
+            btnSelectDone.disabled = !selectedName;
+        }));
+
+        // 전환 제어(+ 유효성 검사 및 이름 전달)
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-next],[data-back]');
+            if (!btn) return;
+
+            const current = btn.getAttribute('data-current');
+            const next = btn.getAttribute('data-next');
+            const back = btn.getAttribute('data-back');
+
+            if (next) {
+                if (current === '#modalSelectCounterpart' && next === '#modalConfirmDone') {
+                    if (!selectedName) return;
+                    document.getElementById('confirmName').textContent = `‘${selectedName}’`;
+                }
+                if (current === '#modalConfirmDone' && next === '#modalDoneResult') {
+                    document.getElementById('resultName').textContent = `‘${selectedName}’`;
+                }
+                goNext(current, next);
+            } else if (back) {
+                goBack(current, back);
+            }
+        });
+
+        // 마지막 모달 닫힐 때 초기화
+        document.getElementById('modalDoneResult').addEventListener('hidden.bs.modal', () => {
+            ['modalConfirmDone', 'modalSelectCounterpart'].forEach(id => {
+                const inst = bootstrap.Modal.getInstance(document.getElementById(id));
+                inst && inst.hide();
+            });
+            radios.forEach(r => r.checked = false);
+            btnSelectDone.disabled = true;
+            selectedName = '';
+        });
+    })();
+</script>
 </html>
