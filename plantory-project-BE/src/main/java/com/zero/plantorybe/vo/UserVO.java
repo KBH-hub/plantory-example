@@ -1,4 +1,4 @@
-package com.zero.plantoryprojectbe.vo;
+package com.zero.plantorybe.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

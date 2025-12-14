@@ -1,8 +1,8 @@
-package com.zero.plantoryprojectbe.service;
+package com.zero.plantorybe.service;
 
-import com.zero.plantoryprojectbe.repository.User;
-import com.zero.plantoryprojectbe.repository.UserRepository;
-import com.zero.plantoryprojectbe.vo.UserVO;
+import com.zero.plantorybe.repository.User;
+import com.zero.plantorybe.repository.UserRepository;
+import com.zero.plantorybe.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

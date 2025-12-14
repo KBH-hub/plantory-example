@@ -1,8 +1,8 @@
-package com.zero.plantoryprojectbe.auth;
+package com.zero.plantorybe.auth;
 
-import com.zero.plantoryprojectbe.jwt.JwtAuthenticationFilter;
-import com.zero.plantoryprojectbe.jwt.JwtBasicAuthenticationFilter;
-import com.zero.plantoryprojectbe.repository.UserRepository;
+import com.zero.plantorybe.jwt.JwtAuthenticationFilter;
+import com.zero.plantorybe.jwt.JwtBasicAuthenticationFilter;
+import com.zero.plantorybe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

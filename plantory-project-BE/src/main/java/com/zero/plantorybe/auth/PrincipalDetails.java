@@ -1,6 +1,6 @@
-package com.zero.plantoryprojectbe.auth;
+package com.zero.plantorybe.auth;
 
-import com.zero.plantoryprojectbe.repository.User;
+import com.zero.plantorybe.repository.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

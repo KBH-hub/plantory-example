@@ -1,4 +1,4 @@
-package com.zero.plantoryprojectbe.auth;
+package com.zero.plantorybe.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,9 +1,9 @@
-package com.zero.plantoryprojectbe.jwt;
+package com.zero.plantorybe.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.zero.plantoryprojectbe.auth.PrincipalDetails;
-import com.zero.plantoryprojectbe.vo.UserVO;
+import com.zero.plantorybe.auth.PrincipalDetails;
+import com.zero.plantorybe.vo.UserVO;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

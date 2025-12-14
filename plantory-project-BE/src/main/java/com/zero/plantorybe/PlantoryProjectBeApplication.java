@@ -1,4 +1,4 @@
-package com.zero.plantoryprojectbe;
+package com.zero.plantorybe;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

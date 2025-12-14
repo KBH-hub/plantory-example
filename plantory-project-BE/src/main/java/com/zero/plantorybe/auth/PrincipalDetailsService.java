@@ -1,7 +1,7 @@
-package com.zero.plantoryprojectbe.auth;
+package com.zero.plantorybe.auth;
 
-import com.zero.plantoryprojectbe.repository.User;
-import com.zero.plantoryprojectbe.repository.UserRepository;
+import com.zero.plantorybe.repository.User;
+import com.zero.plantorybe.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

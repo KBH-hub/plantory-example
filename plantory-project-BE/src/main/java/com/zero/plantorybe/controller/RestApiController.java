@@ -1,7 +1,7 @@
-package com.zero.plantoryprojectbe.controller;
+package com.zero.plantorybe.controller;
 
-import com.zero.plantoryprojectbe.service.UserService;
-import com.zero.plantoryprojectbe.vo.UserVO;
+import com.zero.plantorybe.service.UserService;
+import com.zero.plantorybe.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

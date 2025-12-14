@@ -1,4 +1,4 @@
-package com.zero.plantoryprojectbe.jwt;
+package com.zero.plantorybe.jwt;
 
 public interface JwtProperties {
     String SECRET = "plantory";

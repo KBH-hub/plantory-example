@@ -1,4 +1,4 @@
-package com.zero.plantoryprojectbe.repository;
+package com.zero.plantorybe.repository;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
