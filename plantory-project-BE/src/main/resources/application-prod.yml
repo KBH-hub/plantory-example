@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: plantory-project-BE
+
+  cloud:
+    gcp:
+      storage:
+        project-id: ${GCP_STORAGE_PROJECT_ID:logical-voyage-477015-j4}
+
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+server:
+  port: ${SERVER_PORT:9000}
+
+openapi:
+  nongsaro:
+    key: ${OPENAPI_NONGSARO_KEY}
+
+security:
+  remember-me:
+    key: ${REMEMBER_ME_KEY}
+
+jwt:
+  issuer: ${JWT_ISSUER}
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_EXPIRATION:1800000}
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:1209600000}
+
+app:
+  cors:
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS}

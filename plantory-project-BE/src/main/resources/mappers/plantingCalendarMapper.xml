@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zero.plantoryprojectbe.plantingCalendar.PlantingCalendarMapper">
+
+    <update id="updatePlantWateringCheck" parameterType="Long">
+        UPDATE watering
+        SET check_flag =  NOW()
+        WHERE watering_id = #{wateringId}
+    </update>
+
+    <update id="updateMyPlantWatering" parameterType="Long">
+        UPDATE myplant
+        SET start_at = NULL, end_date = NULL, `interval` = NULL
+        WHERE myplant_id = #{myplantId}
+    </update>
+
+    <delete id="deletePlantWatering" parameterType="Long">
+        DELETE FROM watering
+        WHERE myplant_id = #{myplantId};
+    </delete>
+
+    <select id="selectWateringCalendar"
+            parameterType="map"
+            resultType="com.zero.plantoryprojectbe.plantingCalendar.dto.PlantingCalendarResponse">
+        SELECT
+            w.watering_id,
+            w.myplant_id,
+            p.member_id,
+            p.name,
+            w.date_at,
+            w.check_flag,
+            'WATERING' type
+        FROM watering w
+        JOIN myplant p ON w.myplant_id = p.myplant_id
+        WHERE p.member_id = #{memberId}
+            AND p.del_flag IS NULL
+            AND w.date_at >= #{startDate, jdbcType=TIMESTAMP}
+            AND w.date_at &lt; #{endDate, jdbcType=TIMESTAMP}
+        ORDER BY w.date_at ASC;
+    </select>
+
+    <select id="selectDiaryCalendar"
+            parameterType="map"
+            resultType="com.zero.plantoryprojectbe.plantingCalendar.dto.PlantingCalendarResponse">
+        SELECT
+            d.diary_id,
+            d.myplant_id,
+            p.member_id,
+            p.name,
+            d.memo,
+            d.created_at,
+        'DIARY' type
+        FROM diary d
+        JOIN myplant p ON d.myplant_id = p.myplant_id
+        WHERE p.member_id = #{memberId}
+            AND p.del_flag IS NULL
+            AND d.created_at >= #{startDate, jdbcType=TIMESTAMP}
+            AND d.created_at &lt; #{endDate, jdbcType=TIMESTAMP}
+        ORDER BY d.created_at ASC;
+    </select>
+
+    <select id="selectDiaryUpdateInfo" resultType="com.zero.plantoryprojectbe.plantingCalendar.dto.DiaryResponse">
+        SELECT
+            d.diary_id,
+            d.myplant_id,
+            mp.name,
+            d.activity,
+            d.state,
+            d.memo,
+            d.created_at
+        FROM diary d
+                 JOIN myplant mp
+                      ON mp.myplant_id = d.myplant_id
+        WHERE d.diary_id = #{diaryId}
+    </select>
+
+    <update id="updateDiary">
+        UPDATE diary
+        SET activity = #{activity},
+            state = #{state},
+            memo = #{memo}
+        WHERE diary_id = #{diaryId};
+    </update>
+
+    <select id="selectMyPlant" resultType="com.zero.plantoryprojectbe.plantingCalendar.dto.MyPlantDiaryResponse">
+        SELECT myplant_id, NAME
+        FROM myplant
+        WHERE member_id = #{memberId}
+          AND del_flag IS NULL
+    </select>
+
+    <insert id="insertDiary"
+            parameterType="com.zero.plantoryprojectbe.plantingCalendar.dto.DiaryRequest"
+            useGeneratedKeys="true"
+            keyProperty="diaryId"
+            keyColumn="diary_id">
+        INSERT INTO diary (myplant_id,activity, state, memo, created_at)
+        VALUES (#{myplantId},#{activity}, #{state}, #{memo},NOW());
+    </insert>
+
+    <delete id="deleteDiary">
+        DELETE FROM diary
+        WHERE diary_id = #{diaryId}
+    </delete>
+
+    <select id="selectMyplantsForWindow" parameterType="int"
+            resultType="com.zero.plantoryprojectbe.plantingCalendar.dto.MyplantSlotBaseResponse">
+        SELECT mp.myplant_id,
+        mp.start_at,
+        mp.end_date,
+        mp.`interval`,
+        m.phone,
+        m.member_id,
+        mp.name
+        FROM myplant mp
+        JOIN member m ON m.member_id = mp.member_id
+        WHERE mp.del_flag   IS NULL
+        AND mp.start_at   IS NOT NULL
+        AND mp.end_date   IS NOT NULL
+        AND mp.`interval` IS NOT NULL
+        AND mp.start_at &lt;= DATE_ADD(NOW(), INTERVAL 1 DAY)
+        AND mp.end_date >= NOW()
+        LIMIT #{limit}
+    </select>
+
+    <insert id="insertWatering">
+        INSERT IGNORE INTO watering (myplant_id, date_at)
+        VALUES (#{myplantId}, #{dateAt})
+    </insert>
+
+</mapper>

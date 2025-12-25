@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zero.plantoryprojectbe.weightManagement.WeightManagementMapper">
+
+    <insert id="insertSkillRateGrade">
+        INSERT INTO skill_rate_grade
+        (member_id, initial_skill_rate, skill_rate_grade_1, skill_rate_grade_2,
+         skill_rate_grade_3, skill_rate_grade_4)
+        VALUES
+            (#{memberId}, #{initialSkillRate}, #{skillRateGrade1}, #{skillRateGrade2}, #{skillRateGrade3}, #{skillRateGrade4});
+    </insert>
+
+    <insert id="insertManagementRateGrade">
+        INSERT INTO management_rate_grade
+        (member_id, initial_management_rate, management_rate_grade_1,
+         management_rate_grade_2, management_rate_grade_3)
+        VALUES
+            (#{memberId}, #{initialManagementRate}, #{managementRateGrade1}, #{managementRateGrade2}, #{managementRateGrade3});
+    </insert>
+
+    <select id="selectLatestRateGrades" resultType="com.zero.plantoryprojectbe.weightManagement.dto.RateResponse">
+        SELECT
+            s.initial_skill_rate,
+            s.skill_rate_grade_1,
+            s.skill_rate_grade_2,
+            s.skill_rate_grade_3,
+            s.skill_rate_grade_4,
+
+            m.initial_management_rate,
+            m.management_rate_grade_1,
+            m.management_rate_grade_2,
+            m.management_rate_grade_3
+        FROM
+            skill_rate_grade s
+                CROSS JOIN management_rate_grade m
+        WHERE
+            s.skill_rate_grade_id = (SELECT MAX(skill_rate_grade_id) FROM skill_rate_grade)
+          AND
+            m.management_rate_grade_id = (SELECT MAX(management_rate_grade_id) FROM management_rate_grade);
+    </select>
+
+    <select id="selectWeightManagementList" resultType="com.zero.plantoryprojectbe.weightManagement.dto.WeightManagementResponse">
+        SELECT
+        m.member_id,
+        m.membername,
+        m.nickname,
+        COALESCE(sl.search_count, 0) AS searchWeight,
+        COALESCE(q.question_count, 0) AS questionWeight,
+        (SELECT COUNT(*) FROM member) AS totalCount
+        FROM member m
+
+        LEFT JOIN (
+        SELECT member_id, COUNT(*) AS search_count
+        FROM search_logging
+        WHERE 1=1
+        <if test="startDate != null">
+            AND created_at >= #{startDate}
+        </if>
+        GROUP BY member_id
+        ) sl ON sl.member_id = m.member_id
+
+        LEFT JOIN (
+        SELECT member_id, COUNT(*) AS question_count
+        FROM question
+        WHERE 1=1
+        <if test="startDate != null">
+            AND created_at >= #{startDate}
+        </if>
+        GROUP BY member_id
+        ) q ON q.member_id = m.member_id
+        WHERE 1=1
+        <if test="keyword != null and keyword != ''">
+            AND m.membername LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+
+        ORDER BY m.member_id DESC
+        LIMIT #{offset} , #{limit}
+    </select>
+
+    <select id="selectPlantsNeedingAttention"
+            resultType="map">
+        <![CDATA[
+        SELECT m.member_id,
+        COUNT(DISTINCT m.myplant_id) AS care_count
+        FROM watering w
+        JOIN myplant m ON w.myplant_id = m.myplant_id
+        WHERE m.del_flag IS NULL
+        AND DATE(w.date_at) < CURDATE()
+        AND DATE(w.date_at) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        AND w.check_flag IS NULL
+        GROUP BY m.member_id
+        ]]>
+    </select>
+
+    <insert id="insertWeights">
+        INSERT INTO weight_logging
+            (member_id, search_weight, question_weight, created_at)
+        VALUES
+            (#{memberId}, #{searchWeight}, #{questionWeight}, NOW())
+    </insert>
+
+    <select id="selectLatestWeights"
+            resultType="com.zero.plantoryprojectbe.weightManagement.dto.WeightLoggingResponse">
+        SELECT search_weight, question_weight
+        FROM weight_logging
+        ORDER BY created_at DESC
+        LIMIT 1
+    </select>
+
+</mapper>

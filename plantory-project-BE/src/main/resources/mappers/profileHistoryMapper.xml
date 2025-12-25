@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zero.plantoryprojectbe.profile.ProfileSharingHistoryMapper">
+
+    <select id="countMySharing" resultType="int">
+        SELECT COUNT(*)
+        FROM sharing
+        WHERE member_id = #{memberId}
+          AND del_flag IS NULL
+    </select>
+
+    <select id="countReceivedSharing" resultType="int">
+        SELECT COUNT(*)
+        FROM sharing
+        WHERE target_member_id = #{memberId}
+          AND del_flag IS NULL
+    </select>
+
+
+    <select id="selectMySharingList" resultType="com.zero.plantoryprojectbe.profile.dto.ProfileSharingHistoryListResponse">
+        SELECT
+        s.sharing_id,
+        s.target_member_id,
+        s.title,
+        s.status,
+        s.interest_num,
+        s.created_at,
+        s.review_flag,
+        s.target_member_review_flag,
+
+        (SELECT COUNT(*)
+        FROM comment c
+        WHERE c.sharing_id = s.sharing_id
+        AND c.del_flag IS NULL) AS commentCount,
+
+        (SELECT file_url
+        FROM image i
+        WHERE i.target_type = 'SHARING'
+        AND i.target_id = s.sharing_id
+        AND i.del_flag IS NULL
+        ORDER BY i.image_id LIMIT 1) AS thumbnail,
+
+        COUNT(*) OVER() AS total_count
+        FROM sharing s
+        WHERE s.member_id = #{memberId}
+        <if test="keyword != null and keyword != ''">
+            AND s.title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+
+        <if test="status != null and status != ''">
+            AND s.status = #{status}
+        </if>
+          AND s.del_flag IS NULL
+        ORDER BY s.created_at DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+
+    <select id="selectReceivedSharingList" resultType="com.zero.plantoryprojectbe.profile.dto.ProfileSharingHistoryListResponse">
+        SELECT
+        s.sharing_id,
+        s.target_member_id,
+        s.title,
+        s.status,
+        s.interest_num,
+        s.created_at,
+        s.review_flag,
+        s.target_member_review_flag,
+
+        (SELECT COUNT(*)
+        FROM comment c
+        WHERE c.sharing_id = s.sharing_id
+        AND c.del_flag IS NULL) AS commentCount,
+
+        (SELECT file_url
+        FROM image i
+        WHERE i.target_type = 'SHARING'
+        AND i.target_id = s.sharing_id
+        AND i.del_flag IS NULL
+        ORDER BY i.image_id LIMIT 1) AS thumbnail,
+
+        COUNT(*) OVER() AS total_count
+        FROM sharing s
+        WHERE s.target_member_id = #{memberId}
+        <if test="keyword != null and keyword != ''">
+            AND s.title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+
+        <if test="status != null and status != ''">
+            AND s.status = #{status}
+        </if>
+          AND s.del_flag IS NULL
+        ORDER BY s.created_at DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+
+
+    <select id="countByInterestCount" resultType="int" parameterType="Long">
+        SELECT COUNT(interest_id)
+        FROM interest
+        WHERE member_id = #{memberId}
+    </select>
+
+    <select id="countByCompletedSharingCount" resultType="int" parameterType="Long">
+        SELECT COUNT(sharing_id)
+        FROM sharing
+        WHERE status = 'true'
+          AND (member_id = #{memberId} OR target_member_id = #{memberId})
+    </select>
+</mapper>

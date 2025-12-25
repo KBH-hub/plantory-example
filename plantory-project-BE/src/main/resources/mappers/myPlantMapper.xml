@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zero.plantoryprojectbe.myPlant.MyPlantMapper">
+    <select id="selectMyPlantList" resultType="com.zero.plantoryprojectbe.myPlant.dto.MyPlantResponse">
+        SELECT myplant_id,member_id,type,name,start_at,end_date,`interval`,soil,temperature,created_at,
+        COUNT(*) OVER() AS total_count
+        FROM myplant
+        WHERE del_flag IS NULL
+          AND member_id = #{memberId}
+          AND name LIKE CONCAT('%', #{name}, '%')
+        ORDER BY created_at DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <insert id="insertMyPlant"
+            useGeneratedKeys="true"
+            keyProperty="myplantId"
+            keyColumn="myplant_id">
+        INSERT INTO myplant
+        (member_id, name, type, start_at, end_date, `interval`, soil, temperature, created_at)
+        VALUES (
+                   #{memberId},
+                   #{name},
+                   #{type},
+                   #{startAt},
+                   #{endDate},
+                   #{interval},
+                   #{soil},
+                   #{temperature},
+                   NOW()
+               );
+
+    </insert>
+
+    <update id="updateMyPlant">
+        UPDATE myplant
+        SET member_id  = #{memberId},
+            name       = #{name},
+            type       = #{type},
+            start_at   = #{startAt},
+            end_date    = #{endDate},
+            `interval` = #{interval},
+            soil       = #{soil},
+            temperature = #{temperature}
+        WHERE myplant_id = #{myplantId}
+    </update>
+
+    <update id="deletePlant">
+        UPDATE myplant
+        SET
+            del_flag = NOW()
+        WHERE myplant_id = #{myplantId};
+    </update>
+</mapper>

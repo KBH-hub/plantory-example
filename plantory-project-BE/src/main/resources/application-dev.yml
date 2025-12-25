@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: plantory-project-BE
+
+  cloud:
+    gcp:
+      storage:
+        project-id: logical-voyage-477015-j4
+
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/plantorydb
+    username: pldbid
+    password: pldbpw
+
+server:
+  port: 9000
+
+openapi:
+  nongsaro:
+    key: ${OPENAPI_NONGSARO_KEY:}
+
+security:
+  remember-me:
+    key: dev-test-key
+
+jwt:
+  issuer: kimjaewook8581@gmail.com
+  secret: study-springboot-jwt-secret-key-256bit!! #배포시엔 git bash에 랜덤문자열 명령어 실행 openssl rand -base64 32
+  access-token-expiration: 1800000
+  refresh-token-expiration: 1209600000
+
+app:
+  cors:
+    allowed-origin-patterns: "http://localhost:5173"

@@ -1,0 +1,24 @@
+package com.zero.plantoryprojectbe.plantingCalendar;
+
+import com.zero.plantoryprojectbe.plantingCalendar.dto.*;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Mapper
+public interface PlantingCalendarMapper {
+    int updatePlantWateringCheck(@Param("wateringId") Long wateringId);
+    int updateMyPlantWatering(@Param("myplantId") Long myplantId);
+    int deletePlantWatering(@Param("myplantId") Long myplantId);
+    List<PlantingCalendarResponse> selectWateringCalendar(@Param("memberId") Long memberId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    List<PlantingCalendarResponse> selectDiaryCalendar(@Param("memberId") Long memberId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    DiaryResponse selectDiaryUpdateInfo(@Param("diaryId") Long diaryId);
+    int updateDiary(DiaryRequest request);
+    List<MyPlantDiaryResponse> selectMyPlant(@Param("memberId") Long memberId);
+    int insertDiary(DiaryRequest request);
+    int deleteDiary(Long diaryId);
+    List<MyplantSlotBaseResponse> selectMyplantsForWindow(@Param("limit") int limit);
+    int insertWatering(@Param("myplantId") Long myplantId, @Param("dateAt") LocalDateTime dateAt);
+}

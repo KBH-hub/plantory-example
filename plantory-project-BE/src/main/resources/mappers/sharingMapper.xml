@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zero.plantoryprojectbe.sharing.SharingMapper">
+
+    <select id="selectSharingListByAddressAndKeyword"
+            parameterType="com.zero.plantoryprojectbe.sharing.dto.SharingSearchRequest"
+            resultType="com.zero.plantoryprojectbe.sharing.dto.SharingCardListResponse">
+
+        SELECT
+            s.sharing_id,
+            s.title,
+            s.interest_num,
+            s.status,
+            s.created_at,
+            s.updated_at,
+
+            (SELECT COUNT(*) FROM comment c
+             WHERE c.sharing_id = s.sharing_id AND c.del_flag IS NULL) AS comment_count,
+
+            (SELECT i.file_url
+             FROM image i
+             WHERE i.target_type = 'SHARING'
+               AND i.target_id = s.sharing_id
+               AND i.del_flag IS NULL
+             ORDER BY i.image_id ASC, i.created_at ASC
+                                                                          LIMIT 1) AS file_url
+
+        FROM sharing s
+            JOIN member m ON s.member_id = m.member_id
+
+        WHERE
+            (#{userAddress} IS NULL OR m.address LIKE CONCAT(#{userAddress}, '%'))
+          AND s.del_flag IS NULL
+          AND m.del_flag IS NULL
+          AND (#{keyword} IS NULL OR #{keyword} = '' OR s.title LIKE CONCAT('%', #{keyword}, '%'))
+
+        ORDER BY s.created_at DESC
+            LIMIT #{limit} OFFSET #{offset}
+
+    </select>
+
+
+
+    <select id="countInterestByMemberId" resultType="int">
+        SELECT COUNT(*)
+        FROM interest i
+                 JOIN sharing s ON i.sharing_id = s.sharing_id
+        WHERE i.member_id = #{memberId}
+          AND s.del_flag IS NULL
+    </select>
+
+    <select id="selectPopularSharingList" parameterType="com.zero.plantoryprojectbe.sharing.dto.SharingSearchRequest"
+            resultType="com.zero.plantoryprojectbe.sharing.dto.SharingPopularResponse">
+
+        SELECT
+            s.sharing_id,
+            s.title,
+            s.interest_num,
+            s.status,
+            s.created_at,
+
+            (
+                SELECT COUNT(*)
+                FROM comment c
+                WHERE c.sharing_id = s.sharing_id
+                  AND c.del_flag IS NULL
+            ) AS comment_count,
+
+            (
+                SELECT i.file_url
+                FROM image i
+                WHERE i.target_type = 'SHARING'
+                  AND i.target_id = s.sharing_id
+                  AND i.del_flag IS NULL
+                ORDER BY i.image_id ASC, i.created_at ASC
+                 LIMIT 1
+            ) AS file_url
+
+        FROM sharing s
+            JOIN member m ON s.member_id = m.member_id
+
+        WHERE
+            s.del_flag IS NULL
+          AND m.del_flag IS NULL
+          AND s.interest_num IS NOT NULL
+          AND s.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+          AND (#{userAddress} IS NULL OR m.address LIKE CONCAT(#{userAddress}, '%'))
+
+        ORDER BY s.interest_num DESC, s.created_at DESC
+            LIMIT 3
+
+    </select>
+
+    <insert id="insertSharing"
+            parameterType="com.zero.plantoryprojectbe.sharing.dto.SharingRequest"
+            useGeneratedKeys="true"
+            keyProperty="sharingId">
+
+        INSERT INTO sharing
+        (member_id, target_member_id, title, content, plant_type,
+         management_level, management_needs,
+         interest_num, status, created_at)
+        VALUES
+            (#{memberId},
+             #{targetMemberId},
+             #{title},
+             #{content},
+             #{plantType},
+             #{managementLevel},
+             #{managementNeeds},
+             0,
+             'false',
+             NOW())
+    </insert>
+
+    <select id="selectSharingDetail" resultType="com.zero.plantoryprojectbe.sharing.dto.SelectSharingDetailResponse">
+        SELECT
+            s.sharing_id,
+            s.member_id,
+            s.target_member_id,
+            mb.nickname,
+            mb.sharing_rate,
+            s.title,
+            s.content,
+            s.plant_type,
+            s.management_level,
+            s.management_needs,
+            s.interest_num,
+            s.status,
+            s.created_at,
+            s.updated_at,
+            s.review_flag,
+            s.target_member_review_flag AS receiverReviewFlag,
+            CASE
+                WHEN #{memberId} IS NULL THEN FALSE
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM interest i
+                    WHERE i.sharing_id = s.sharing_id
+                      AND i.member_id = #{memberId}
+                ) THEN TRUE
+                ELSE FALSE
+                END AS interested
+
+        FROM sharing s
+                 JOIN member mb ON s.member_id = mb.member_id
+        WHERE s.sharing_id = #{sharingId}
+          AND s.del_flag IS NULL
+          AND mb.del_flag IS NULL
+    </select>
+
+    <select id="selectSharingComments"
+            parameterType="long"
+            resultType="com.zero.plantoryprojectbe.sharing.dto.SelectCommentListResponse">
+
+        SELECT
+            c.comment_id,
+            c.writer_id,
+            mb.nickname,
+            c.content,
+            c.created_at,
+            c.updated_at
+        FROM comment c
+                 JOIN member mb ON c.writer_id = mb.member_id
+        WHERE c.sharing_id = #{sharingId}
+          AND c.del_flag IS NULL
+          AND mb.del_flag IS NULL
+        ORDER BY c.created_at ASC
+
+    </select>
+
+    <select id="countInterest" resultType="int">
+        SELECT COUNT(*)
+        FROM interest
+        WHERE member_id = #{memberId}
+          AND sharing_id = #{sharingId}
+        FOR UPDATE
+    </select>
+
+
+    <insert id="insertInterest">
+        INSERT INTO interest (member_id, sharing_id)
+        VALUES (#{memberId}, #{sharingId})
+    </insert>
+
+
+    <delete id="deleteInterest">
+        DELETE FROM interest
+        WHERE member_id = #{memberId}
+          AND sharing_id = #{sharingId}
+    </delete>
+
+
+    <update id="increaseInterestNum">
+        UPDATE sharing
+        SET interest_num = interest_num + 1
+        WHERE sharing_id = #{sharingId}
+    </update>
+
+
+    <update id="decreaseInterestNum">
+        UPDATE sharing
+        SET interest_num = GREATEST(interest_num - 1, 0)
+        WHERE sharing_id = #{sharingId}
+    </update>
+
+    <insert id="insertComment">
+        INSERT INTO comment
+            (sharing_id, writer_id, content, created_at, updated_at, del_flag)
+        VALUES
+            (#{sharingId}, #{writerId}, #{content}, NOW(), NULL, NULL)
+    </insert>
+
+    <select id="countProfileComment" resultType="int">
+        SELECT COUNT(*)
+        FROM comment
+        WHERE comment_id = #{commentId}
+          AND sharing_id = #{sharingId}
+          AND writer_id  = #{writerId}
+          AND del_flag IS NULL
+    </select>
+
+    <update id="updateCommentById">
+        UPDATE comment
+        SET content    = #{content},
+            updated_at = NOW()
+        WHERE comment_id = #{commentId}
+          AND sharing_id = #{sharingId}
+          AND writer_id  = #{writerId}
+          AND del_flag IS NULL
+    </update>
+
+    <update id="deleteComment" parameterType="com.zero.plantoryprojectbe.sharing.dto.CommentRequest">
+        UPDATE comment
+        SET del_flag = NOW()
+        WHERE comment_id = #{commentId}
+          AND sharing_id = #{sharingId}
+          AND writer_id  = #{writerId}
+          AND del_flag IS NULL
+    </update>
+
+    <select id="countProfileSharing" resultType="int">
+        SELECT COUNT(*)
+        FROM sharing
+        WHERE sharing_id = #{sharingId}
+          AND member_id = #{memberId}
+          AND del_flag IS NULL
+    </select>
+
+    <update id="updateSharing"
+            parameterType="com.zero.plantoryprojectbe.sharing.dto.SharingRequest">
+        UPDATE sharing
+        SET title            = #{title},
+            content          = #{content},
+            plant_type       = #{plantType},
+            management_level = #{managementLevel},
+            management_needs = #{managementNeeds},
+            updated_at       = NOW()
+        WHERE sharing_id = #{sharingId}
+          AND member_id  = #{memberId}
+          AND del_flag IS NULL
+    </update>
+
+    <update id="deleteSharing" parameterType="long">
+        UPDATE sharing
+        SET del_flag = NOW()
+        WHERE sharing_id = #{sharingId}
+    </update>
+
+    <select id="selectSharingMessagePartners"
+            parameterType="map"
+            resultType="com.zero.plantoryprojectbe.sharing.dto.SharingPartnerResponse">
+        SELECT DISTINCT mb.member_id, mb.nickname
+        FROM message m
+                 JOIN member mb ON m.sender_id = mb.member_id
+        WHERE m.receiver_id = #{receiverId}
+          AND m.target_type = 'SHARING'
+          AND m.target_id = #{sharingId}
+          AND m.del_flag IS NULL
+          AND mb.del_flag IS NULL
+        ORDER BY mb.nickname ASC
+
+    </select>
+
+    <update id="updateSharingComplete">
+        UPDATE sharing
+        SET target_member_id = #{targetMemberId},
+            status = 'true',
+            updated_at = NOW()
+        WHERE sharing_id = #{sharingId}
+    </update>
+
+    <select id="selectProfileSharingGiven" resultType="com.zero.plantoryprojectbe.sharing.dto.SharingHistoryResponse">
+
+        SELECT
+            s.sharing_id     AS sharingId,
+            s.target_member_id AS partnerId,
+            mb.nickname      AS partnerNickname,
+            s.title,
+            s.created_at
+        FROM sharing s
+                 JOIN member mb ON s.target_member_id = mb.member_id
+        WHERE s.member_id = #{memberId}
+          AND s.status = 'true'
+          AND s.target_member_id IS NOT NULL
+          AND s.del_flag IS NULL
+          AND mb.del_flag IS NULL
+        ORDER BY s.created_at DESC
+    </select>
+
+
+    <select id="selectProfileSharingReceived" resultType="com.zero.plantoryprojectbe.sharing.dto.SharingHistoryResponse">
+
+        SELECT
+            s.sharing_id     AS sharingId,
+            s.member_id      AS partnerId,
+            mb.nickname      AS partnerNickname,
+            s.title,
+            s.created_at
+        FROM sharing s
+                 JOIN member mb ON s.member_id = mb.member_id
+        WHERE s.target_member_id = #{memberId}
+          AND s.status = 'true'
+          AND s.del_flag IS NULL
+          AND mb.del_flag IS NULL
+        ORDER BY s.created_at DESC
+    </select>
+
+
+    <update id="updateSharingRate">
+        UPDATE member
+        SET sharing_rate = #{score}
+        WHERE member_id = #{memberId}
+    </update>
+
+
+    <update id="updateReviewFlag">
+        UPDATE sharing
+        SET review_flag = NOW()
+        WHERE sharing_id = #{sharingId}
+    </update>
+
+    <update id="updateReceiverReviewFlag">
+        UPDATE sharing
+        SET target_member_review_flag = NOW()
+        WHERE sharing_id = #{sharingId}
+    </update>
+
+
+
+    <select id="selectReviewInfoForGiver"
+            resultType="com.zero.plantoryprojectbe.sharing.dto.ReviewInfoResponse">
+
+        SELECT
+            s.sharing_id AS sharingId,
+            s.title AS title,
+            s.created_at AS createdAt,
+            mb.member_id AS partnerId,
+            mb.nickname AS partnerNickname
+        FROM sharing s
+                 JOIN member mb ON mb.member_id = s.target_member_id
+        WHERE s.sharing_id = #{sharingId}
+          AND s.status = 'true'
+          AND s.member_id = #{memberId}
+          AND s.review_flag IS NULL
+          AND s.del_flag IS NULL
+          AND mb.del_flag IS NULL;
+    </select>
+
+    <select id="selectReviewInfoForReceiver"
+            resultType="com.zero.plantoryprojectbe.sharing.dto.ReviewInfoResponse">
+
+        SELECT
+            s.sharing_id AS sharingId,
+            s.title AS title,
+            s.created_at AS createdAt,
+            mb.member_id AS partnerId,
+            mb.nickname AS partnerNickname
+        FROM sharing s
+                 JOIN member mb ON mb.member_id = s.member_id
+        WHERE s.sharing_id = #{sharingId}
+          AND s.target_member_id = #{memberId}
+          AND s.status = 'true'
+          AND s.target_member_review_flag IS NULL
+          AND s.del_flag IS NULL
+          AND mb.del_flag IS NULL;
+
+    </select>
+
+    <select id="countCompletedSharingByMemberId" resultType="int">
+        SELECT COUNT(*)
+        FROM sharing
+        WHERE member_id = #{memberId}
+          AND status = 'true'
+          AND del_flag IS NULL
+    </select>
+
+
+</mapper>

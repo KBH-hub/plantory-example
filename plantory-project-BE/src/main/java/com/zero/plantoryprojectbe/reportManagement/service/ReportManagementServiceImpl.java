@@ -1,0 +1,68 @@
+package com.zero.plantoryprojectbe.reportManagement.service;
+
+import com.zero.plantoryprojectbe.profile.ProfileMapper;
+import com.zero.plantoryprojectbe.profile.dto.MemberResponse;
+import com.zero.plantoryprojectbe.profile.service.AdminUserService;
+import com.zero.plantoryprojectbe.reportManagement.ReportManagementMapper;
+import com.zero.plantoryprojectbe.reportManagement.dto.ReportManagementDetailResponse;
+import com.zero.plantoryprojectbe.reportManagement.dto.ReportManagementPageResponse;
+import com.zero.plantoryprojectbe.reportManagement.dto.ReportManagementResponse;
+import com.zero.plantoryprojectbe.reportManagement.dto.ReportManagementSearchRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Slf4j
+@RequiredArgsConstructor
+@Service
+public class ReportManagementServiceImpl implements ReportManagementService {
+
+    private final ReportManagementMapper reportManagementMapper;
+    private final AdminUserService adminUserService;
+    private final ProfileMapper profileMapper;
+
+    @Override
+    public ReportManagementPageResponse getReporManagmentList(ReportManagementSearchRequest request) {
+
+        int totalCount = reportManagementMapper.selectReportTotalCount(request);
+        List<ReportManagementResponse> list = reportManagementMapper.selectReportList(request);
+
+        return ReportManagementPageResponse.builder()
+                .totalCount(totalCount)
+                .list(list)
+                .build();
+    }
+
+    @Override
+    public int deleteReporManagmentList(List<Long> ids) {
+        return reportManagementMapper.deleteReports(ids);
+    }
+
+    @Override
+    public ReportManagementDetailResponse getReportDetail(Long reportId) {
+        return reportManagementMapper.selectReportDetail(reportId);
+    }
+
+        @Transactional
+        @Override
+        public void processReport(Long reportId,
+                                  Long memberId,
+                                  String adminMemo,
+                                  int stopDays) {
+
+            ReportManagementResponse memo = new ReportManagementResponse();
+            memo.setReportId(reportId);
+            memo.setAdminMemo(adminMemo);
+            memo.setStatus("true");
+
+            reportManagementMapper.insertAdminMemo(memo);
+
+            reportManagementMapper.updateStopDay(memberId, stopDays);
+            MemberResponse memberResponse = profileMapper.selectByMemberId(memberId);
+            adminUserService.forceLogout(memberResponse.getMemberId());
+        }
+
+}
