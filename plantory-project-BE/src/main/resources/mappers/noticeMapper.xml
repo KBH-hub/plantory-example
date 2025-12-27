@@ -4,15 +4,14 @@
 <mapper namespace="com.zero.plantoryprojectbe.notice.NoticeMapper">
 
     <select id="selectNoticesByReceiver" resultType="com.zero.plantoryprojectbe.notice.dto.NoticeDTO">
-        SELECT
-            notice_id,
-            receiver_id,
-            target_type,
-            target_id,
-            content,
-            read_flag,
-            created_at,
-            del_flag
+        SELECT notice_id,
+               receiver_id,
+               target_type,
+               target_id,
+               content,
+               read_flag,
+               created_at,
+               del_flag
         FROM notice
         WHERE receiver_id = #{receiverId}
           AND del_flag IS NULL
@@ -23,8 +22,7 @@
     <insert id="insertNotice" parameterType="com.zero.plantoryprojectbe.notice.dto.NoticeDTO">
         INSERT INTO notice
         (receiver_id, target_type, target_id, content, read_flag, created_at, del_flag)
-        VALUES
-            (#{receiverId}, #{targetType}, #{targetId}, #{content}, NULL, NOW(), NULL)
+        VALUES (#{receiverId}, #{targetType}, #{targetId}, #{content}, NULL, NOW(), NULL)
     </insert>
 
     <update id="updateNoticeReadFlag">
@@ -39,5 +37,17 @@
         WHERE receiver_id = #{receiverId}
           AND del_flag IS NULL
     </update>
+
+    <select id="existsTodayWateringNotice" resultType="int">
+        SELECT CASE
+        WHEN EXISTS (SELECT 1
+        FROM notice
+        WHERE receiver_id = #{receiverId}
+            AND target_type = 'WATERING'
+            AND target_id = #{targetId}
+            AND created_at >= CURDATE()
+            AND created_at &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY)) THEN 1
+        ELSE 0 END
+    </select>
 
 </mapper>

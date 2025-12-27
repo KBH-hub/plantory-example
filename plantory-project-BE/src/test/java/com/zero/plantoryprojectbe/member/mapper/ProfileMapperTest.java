@@ -1,8 +1,6 @@
 package com.zero.plantoryprojectbe.member.mapper;
 
-import com.zero.plantoryprojectbe.member.MemberMapper;
 import com.zero.plantoryprojectbe.profile.ProfileMapper;
-import com.zero.plantoryprojectbe.profile.dto.MemberResponse;
 import com.zero.plantoryprojectbe.profile.dto.ProfileUpdateRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;

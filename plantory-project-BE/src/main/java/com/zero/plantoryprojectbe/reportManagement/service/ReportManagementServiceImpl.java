@@ -1,7 +1,8 @@
 package com.zero.plantoryprojectbe.reportManagement.service;
 
+import com.zero.plantoryprojectbe.member.Member;
+import com.zero.plantoryprojectbe.member.MemberRepository;
 import com.zero.plantoryprojectbe.profile.ProfileMapper;
-import com.zero.plantoryprojectbe.profile.dto.MemberResponse;
 import com.zero.plantoryprojectbe.profile.service.AdminUserService;
 import com.zero.plantoryprojectbe.reportManagement.ReportManagementMapper;
 import com.zero.plantoryprojectbe.reportManagement.dto.ReportManagementDetailResponse;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class ReportManagementServiceImpl implements ReportManagementService {
 
     private final ReportManagementMapper reportManagementMapper;
     private final AdminUserService adminUserService;
-    private final ProfileMapper profileMapper;
+    private final MemberRepository memberRepository;
 
     @Override
     public ReportManagementPageResponse getReporManagmentList(ReportManagementSearchRequest request) {
@@ -46,23 +48,26 @@ public class ReportManagementServiceImpl implements ReportManagementService {
         return reportManagementMapper.selectReportDetail(reportId);
     }
 
-        @Transactional
-        @Override
-        public void processReport(Long reportId,
-                                  Long memberId,
-                                  String adminMemo,
-                                  int stopDays) {
+    @Transactional
+    @Override
+    public void processReport(Long reportId,
+                              Long memberId,
+                              String adminMemo,
+                              int stopDays) {
 
-            ReportManagementResponse memo = new ReportManagementResponse();
-            memo.setReportId(reportId);
-            memo.setAdminMemo(adminMemo);
-            memo.setStatus("true");
+        ReportManagementResponse memo = new ReportManagementResponse();
+        memo.setReportId(reportId);
+        memo.setAdminMemo(adminMemo);
+        memo.setStatus("true");
 
-            reportManagementMapper.insertAdminMemo(memo);
+        reportManagementMapper.insertAdminMemo(memo);
 
-            reportManagementMapper.updateStopDay(memberId, stopDays);
-            MemberResponse memberResponse = profileMapper.selectByMemberId(memberId);
-            adminUserService.forceLogout(memberResponse.getMemberId());
-        }
+        reportManagementMapper.updateStopDay(memberId, stopDays);
+
+        Member member = memberRepository.findByMemberIdAndDelFlagIsNull(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
+
+        adminUserService.forceLogout(member.getMemberId());
+    }
 
 }

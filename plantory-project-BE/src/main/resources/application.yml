@@ -1,24 +1,37 @@
 spring:
   application:
     name: plantory-project-BE
-  security:
-    user:
-      name: admin
-      password: 1234
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://127.0.0.1:3306/mydb
-    username: mydbid
-    password: mydbpw
+
   jpa:
     open-in-view: false
-    generate-ddl: true
-    show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+    show-sql: true
     properties:
       hibernate:
-        show_sql: true
         format_sql: true
+
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:mappers/*.xml
+
 server:
-  port: 8882
+  servlet:
+    session:
+      cookie:
+        same-site: Lax
+
+#  export DB_URL='jdbc:mariadb://192.168.0.5:3306/plantorydb'
+#  export DB_USERNAME='pldbid'
+#  export DB_PASSWORD='pldbpw'
+#
+#  export JWT_ISSUER='kimjaewook8581@gmail.com'
+#  export JWT_SECRET='lSmjmuCtdsP7Eg/wUWCyXFfu9/xWBrDenHQONvUoSNo'
+#  export REMEMBER_ME_KEY='uOMFQLdB19TnqOgVkdtKFxhsWxY9AiqEcIO1FIm7Axo='
+#  export OPENAPI_NONGSARO_KEY='20251110HDUJPYCT3K8ZSKCRQQMSJW'
+#
+#  export CORS_ALLOWED_ORIGIN_PATTERNS='http://192.168.0.5:5173,http://192.168.0.5:9000'
+#  export VITE_API_BASE_URL='http://192.168.0.5:9000'
+#  export SPRING_PROFILES_ACTIVE=prod

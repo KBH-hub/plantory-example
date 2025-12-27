@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface RefreshTokenMapper {
-
     int insertRefreshToken(RefreshTokenRequest refreshTokenRequest);
     int updateRefreshToken(RefreshTokenRequest refreshTokenRequest);
     int deleteByMemberId(Long memberId);

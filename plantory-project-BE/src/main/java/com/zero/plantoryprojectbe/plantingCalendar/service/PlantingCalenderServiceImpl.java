@@ -3,6 +3,7 @@ package com.zero.plantoryprojectbe.plantingCalendar.service;
 import com.zero.plantoryprojectbe.global.config.SolapiConfig;
 import com.zero.plantoryprojectbe.image.dto.ImageDTO;
 import com.zero.plantoryprojectbe.global.plantoryEnum.ImageTargetType;
+import com.zero.plantoryprojectbe.notice.NoticeMapper;
 import com.zero.plantoryprojectbe.notice.dto.NoticeDTO;
 import com.zero.plantoryprojectbe.global.plantoryEnum.NoticeTargetType;
 import com.zero.plantoryprojectbe.global.utils.StorageUploader;
@@ -32,6 +33,7 @@ public class PlantingCalenderServiceImpl implements PlantingCalenderService {
     private final SMSService smsService;
     private final SolapiConfig solapi;
     private final NoticeService noticeService;
+    private final NoticeMapper noticeMapper;
 
 
     @Override
@@ -172,14 +174,16 @@ public class PlantingCalenderServiceImpl implements PlantingCalenderService {
 
             if (condToday(nextAt, b.getEndDate(), windowStart, windowEnd)) {
                 ok += plantingCalendarMapper.insertWatering(b.getMyplantId(), nextAt);
-                String noticeText = "오늘 \"" + b.getName() + "\" 물주기 알림";
-                NoticeDTO notice = NoticeDTO.builder()
-                        .receiverId(b.getMemberId())
-                        .targetType(NoticeTargetType.WATERING)
-                        .targetId(b.getMyplantId())
-                        .content(noticeText)
-                        .build();
-                ok += noticeService.registerNotice(notice);
+                if(noticeMapper.existsTodayWateringNotice(b.getMemberId(), b.getMyplantId()) == 0){
+                    String noticeText = "오늘 \"" + b.getName() + "\" 물주기 알림";
+                    NoticeDTO notice = NoticeDTO.builder()
+                            .receiverId(b.getMemberId())
+                            .targetType(NoticeTargetType.WATERING)
+                            .targetId(b.getMyplantId())
+                            .content(noticeText)
+                            .build();
+                    ok += noticeService.registerNotice(notice);
+                }
             }
         }
         return ok;

@@ -14,6 +14,6 @@ public class ProfileUpdateRequest {
     private String nickname;
     private String phone;
     private String address;
-    private Integer noticeEnabled;
+    private Boolean noticeEnabled;
 }
 

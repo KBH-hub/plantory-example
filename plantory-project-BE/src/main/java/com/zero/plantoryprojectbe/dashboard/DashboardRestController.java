@@ -2,7 +2,7 @@ package com.zero.plantoryprojectbe.dashboard;
 
 import com.zero.plantoryprojectbe.dashboard.dto.DashboardSummaryResponse;
 import com.zero.plantoryprojectbe.dashboard.service.DashboardService;
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,10 +35,10 @@ public class DashboardRestController {
     })
     @GetMapping
     public DashboardSummaryResponse getDashboard(
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
         return dashboardService.getDashboardSummary(
-                memberDetail.memberResponse().getMemberId()
+                principal.getMemberId()
         );
     }
 }

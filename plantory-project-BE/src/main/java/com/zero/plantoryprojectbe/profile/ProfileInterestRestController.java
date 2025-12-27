@@ -1,6 +1,6 @@
 package com.zero.plantoryprojectbe.profile;
 
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.profile.dto.ProfileInterestListRequest;
 import com.zero.plantoryprojectbe.profile.dto.ProfileSharingResponse;
 import com.zero.plantoryprojectbe.profile.service.ProfileInterestService;
@@ -40,7 +40,7 @@ public class ProfileInterestRestController {
     })
     @GetMapping
     public ResponseEntity<List<ProfileSharingResponse>> getProfileInterest(
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "검색 키워드", example = "몬스테라")
             @RequestParam(required = false) String keyword,
             @Parameter(description = "조회 개수", example = "10")
@@ -49,7 +49,7 @@ public class ProfileInterestRestController {
             @RequestParam int offset
     ) {
         ProfileInterestListRequest request = new ProfileInterestListRequest();
-        request.setMemberId(memberDetail.memberResponse().getMemberId());
+        request.setMemberId(principal.getMemberId());
         request.setKeyword(keyword);
         request.setLimit(limit);
         request.setOffset(offset);

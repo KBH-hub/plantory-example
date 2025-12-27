@@ -12,4 +12,5 @@ public interface NoticeMapper {
     int insertNotice(NoticeDTO noticeDTO);
     int updateNoticeReadFlag(Long noticeId);
     int deleteAllNotice(@Param("receiverId") Long receiverId);
+    int existsTodayWateringNotice(@Param("receiverId") Long receiverId, @Param("targetId") Long targetId);
 }

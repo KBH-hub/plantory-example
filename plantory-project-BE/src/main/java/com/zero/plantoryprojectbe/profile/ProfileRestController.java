@@ -1,6 +1,6 @@
 package com.zero.plantoryprojectbe.profile;
 
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.image.service.ImageService;
 import com.zero.plantoryprojectbe.profile.dto.PasswordChangeRequest;
 import com.zero.plantoryprojectbe.profile.dto.ProfileInfoResponse;
@@ -44,9 +44,9 @@ public class ProfileRestController {
     })
     @GetMapping("/me")
     public ResponseEntity<ProfileInfoResponse> getProfile(
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        return ResponseEntity.ok(profileService.getProfileInfo(memberDetail.memberResponse().getMemberId()));
+        return ResponseEntity.ok(profileService.getProfileInfo(principal.getMemberId()));
     }
 
     @Operation(summary = "타인 프로필 조회", description = "회원 ID로 공개 프로필 정보를 조회합니다.")
@@ -70,11 +70,11 @@ public class ProfileRestController {
     })
     @PutMapping("/changePassword")
     public ResponseEntity<?> changePassword(
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @RequestBody PasswordChangeRequest req
     ) {
         boolean success = profileService.changePassword(
-                memberDetail.memberResponse().getMemberId(),
+                principal.getMemberId(),
                 req.getOldPassword(),
                 req.getNewPassword()
         );
@@ -90,9 +90,9 @@ public class ProfileRestController {
     })
     @PutMapping("/withdraw")
     public ResponseEntity<?> softWithdraw(
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         profileService.deleteMemberById(memberId);
         return ResponseEntity.ok("회원 탈퇴 완료");
     }
@@ -106,10 +106,10 @@ public class ProfileRestController {
     })
     @PutMapping
     public ResponseEntity<?> updateProfile(
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @RequestBody ProfileUpdateRequest profileUpdateRequest
     ) {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         profileUpdateRequest.setMemberId(memberId);
         profileService.updateProfileInfo(profileUpdateRequest);
         return ResponseEntity.ok("success");
@@ -125,11 +125,11 @@ public class ProfileRestController {
     })
     @PostMapping("/picture")
     public Map<String, Object> uploadProfile(
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "프로필 이미지 파일", required = true)
             @RequestParam("profileImage") MultipartFile file
     ) throws IOException {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         String imageUrl = imageService.uploadProfileImage(memberId, file);
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);

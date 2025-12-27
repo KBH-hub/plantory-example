@@ -1,13 +1,9 @@
 package com.zero.plantoryprojectbe.auth;
 
-import com.zero.plantoryprojectbe.auth.dto.AuthMeResponse;
-import com.zero.plantoryprojectbe.auth.dto.AuthUserResponse;
-import com.zero.plantoryprojectbe.auth.dto.LoginRequest;
+import com.zero.plantoryprojectbe.auth.dto.*;
 import com.zero.plantoryprojectbe.auth.service.AuthService;
-import com.zero.plantoryprojectbe.auth.dto.RefreshTokenRequest;
 import com.zero.plantoryprojectbe.global.security.jwt.TokenProvider;
 import com.zero.plantoryprojectbe.auth.service.RefreshTokenService;
-import com.zero.plantoryprojectbe.profile.dto.MemberResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -106,7 +102,7 @@ public class SecurityAuthRestController {
         RefreshTokenRequest rt = refreshTokenService.findByRefreshToken(refreshToken);
         Long memberId = rt.getMemberId();
 
-        MemberResponse member = authService.findMemberById(memberId);
+        MemberInfoResponse member = authService.findMemberInfo(memberId);
 
         String newAccessToken = tokenProvider.createAccessToken(String.valueOf(memberId));
 
@@ -132,7 +128,7 @@ public class SecurityAuthRestController {
     })
     @GetMapping("/me")
     public ResponseEntity<AuthMeResponse> me(
-            @Parameter(description = "리프레시 토큰 쿠키 값", required = false)
+            @Parameter(description = "리프레시 토큰 쿠키 값")
             @CookieValue(name = "refreshToken", required = false) String refreshToken
     ) {
         if (refreshToken == null) {
@@ -148,14 +144,13 @@ public class SecurityAuthRestController {
         }
 
         Long memberId = rt.getMemberId();
-        MemberResponse member = authService.findMemberById(memberId);
+        MemberInfoResponse member = authService.findMemberInfo(memberId);
 
         if (member == null) {
             return ResponseEntity.status(401).build();
         }
 
         String accessToken = tokenProvider.createAccessToken(String.valueOf(memberId));
-
         return ResponseEntity.ok(
                 AuthMeResponse.builder()
                         .user(
@@ -169,6 +164,7 @@ public class SecurityAuthRestController {
                                         .skillRate(member.getSkillRate())
                                         .managementRate(member.getManagementRate())
                                         .role(member.getRole())
+                                        .profileImageUrl(member.getProfileImageUrl())
                                         .stopDay(member.getStopDay())
                                         .build()
                         )

@@ -1,6 +1,6 @@
 package com.zero.plantoryprojectbe.sharing;
 
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.sharing.dto.ReviewRequest;
 import com.zero.plantoryprojectbe.sharing.service.SharingScoreService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,9 +30,9 @@ public class SharingScoreRestController {
             @Parameter(description = "거래 상대 회원 ID", example = "25")
             @RequestParam Long targetMemberId,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         sharingScoreService.completeSharing(sharingId, memberId, targetMemberId);
         return ResponseEntity.ok(true);
     }
@@ -47,9 +47,9 @@ public class SharingScoreRestController {
             @PathVariable Long sharingId,
             @RequestBody ReviewRequest reviewRequest,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        Long loginUserId = memberDetail.memberResponse().getMemberId();
+        Long loginUserId = principal.getMemberId();
 
         sharingScoreService.registerSharingReview(
                 sharingId,

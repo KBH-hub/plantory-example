@@ -120,7 +120,7 @@
         WHERE target_type = #{targetType}
         AND member_id = #{memberId}
         AND del_flag IS NULL
-        ORDER BY image_id DESC
+        ORDER BY created_at DESC, image_id DESC
         LIMIT 1
     </select>
 

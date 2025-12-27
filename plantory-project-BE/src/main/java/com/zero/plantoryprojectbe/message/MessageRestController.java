@@ -2,7 +2,7 @@ package com.zero.plantoryprojectbe.message;
 
 import com.zero.plantoryprojectbe.global.plantoryEnum.BoxType;
 import com.zero.plantoryprojectbe.global.plantoryEnum.TargetType;
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.message.dto.MessageListResponse;
 import com.zero.plantoryprojectbe.message.dto.MessageRequest;
 import com.zero.plantoryprojectbe.message.dto.MessageResponse;
@@ -40,7 +40,7 @@ public class MessageRestController {
     })
     @GetMapping("/{boxType}")
     public ResponseEntity<List<MessageListResponse>> getMessageList(
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "쪽지함 타입", example = "RECEIVED")
             @PathVariable BoxType boxType,
             @Parameter(description = "대상 타입", example = "SHARING")
@@ -53,7 +53,7 @@ public class MessageRestController {
             @RequestParam int limit
     ) {
         MessageSearchRequest req = new MessageSearchRequest(
-                memberDetail.memberResponse().getMemberId(),
+                principal.getMemberId(),
                 boxType,
                 targetType,
                 title,
@@ -113,11 +113,11 @@ public class MessageRestController {
     public ResponseEntity<MessageResponse> getMessage(
             @Parameter(description = "쪽지 ID", example = "1")
             @PathVariable Long messageId,
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
         MessageResponse result = messageService.findMessageDetail(
                 messageId,
-                memberDetail.memberResponse().getMemberId()
+                principal.getMemberId()
         );
         if (result == null) {
             return ResponseEntity.notFound().build();
@@ -136,9 +136,9 @@ public class MessageRestController {
     @PostMapping("/messageRegist")
     public ResponseEntity<Map<String, String>> registerMessage(
             @RequestBody MessageRequest messageRequest,
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        messageRequest.setSenderId(memberDetail.memberResponse().getMemberId());
+        messageRequest.setSenderId(principal.getMemberId());
         int result = messageService.registerMessage(messageRequest);
         if (result > 0) {
             return ResponseEntity.ok().body(Map.of("message", "regist message success"));

@@ -1,6 +1,6 @@
 package com.zero.plantoryprojectbe.weightManagement;
 
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.weightManagement.dto.*;
 import com.zero.plantoryprojectbe.weightManagement.service.WeightManagementService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,10 +46,10 @@ public class WeightManagementRestController {
     @PostMapping("/list")
     public void saveWeights(
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail principal,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @RequestBody SaveWeightRequest saveWeightRequest
     ) {
-        Long memberId = principal.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         weightManagementService.saveWeights(memberId, saveWeightRequest);
     }
 
@@ -87,10 +87,10 @@ public class WeightManagementRestController {
     @PostMapping("/rate")
     public void saveRate(
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail principal,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @RequestBody SaveRateRequest saveRateRequest
     ) {
-        Long memberId = principal.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         weightManagementService.saveRate(memberId, saveRateRequest);
     }
 }

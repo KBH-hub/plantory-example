@@ -2,7 +2,7 @@ package com.zero.plantoryprojectbe.sharing;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.sharing.dto.CommentRequest;
 import com.zero.plantoryprojectbe.sharing.dto.SharingRequest;
 import com.zero.plantoryprojectbe.sharing.service.SharingWriteService;
@@ -34,13 +34,13 @@ public class SharingWriteRestController {
     @PostMapping
     public ResponseEntity<?> createSharing(
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "나눔 등록 폼데이터", example = "title/content 등")
             @ModelAttribute SharingRequest request,
             @Parameter(description = "첨부 이미지(선택)", example = "files")
             @RequestParam(value = "files", required = false) List<MultipartFile> files
     ) throws IOException {
-        request.setMemberId(memberDetail.memberResponse().getMemberId());
+        request.setMemberId(principal.getMemberId());
         Long sharingId = sharingWriteService.registerSharing(request, files);
         return ResponseEntity.ok(sharingId);
     }
@@ -56,13 +56,13 @@ public class SharingWriteRestController {
             @Parameter(description = "나눔 수정 폼데이터", example = "title/content 등")
             @ModelAttribute SharingRequest request,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "추가 이미지(선택)", example = "files")
             @RequestParam(value = "files", required = false) List<MultipartFile> files
     ) throws IOException {
 
         request.setSharingId(sharingId);
-        request.setMemberId(memberDetail.memberResponse().getMemberId());
+        request.setMemberId(principal.getMemberId());
 
         if (request.getDeletedImageIds() != null && !request.getDeletedImageIds().isBlank()) {
             ObjectMapper mapper = new ObjectMapper();
@@ -83,9 +83,9 @@ public class SharingWriteRestController {
             @Parameter(description = "나눔 ID", example = "100")
             @PathVariable Long sharingId,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) throws IOException {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         boolean result = sharingWriteService.deleteSharing(sharingId, memberId);
         return ResponseEntity.ok(result);
     }
@@ -99,9 +99,9 @@ public class SharingWriteRestController {
             @Parameter(description = "나눔 ID", example = "100")
             @PathVariable Long sharingId,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) throws IOException {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         boolean result = sharingWriteService.addInterest(memberId, sharingId);
         return ResponseEntity.ok(result);
     }
@@ -115,9 +115,9 @@ public class SharingWriteRestController {
             @Parameter(description = "나눔 ID", example = "100")
             @PathVariable Long sharingId,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) throws IOException {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         boolean result = sharingWriteService.removeInterest(memberId, sharingId);
         return ResponseEntity.ok(result);
     }
@@ -131,10 +131,10 @@ public class SharingWriteRestController {
             @Parameter(description = "나눔 ID", example = "100")
             @PathVariable Long sharingId,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @RequestBody CommentRequest request
     ) {
-        Long loginMemberId = memberDetail.memberResponse().getMemberId();
+        Long loginMemberId = principal.getMemberId();
         request.setWriterId(loginMemberId);
         request.setSharingId(sharingId);
 
@@ -153,11 +153,11 @@ public class SharingWriteRestController {
             @Parameter(description = "댓글 ID", example = "300")
             @PathVariable Long commentId,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @RequestBody CommentRequest request
     ) {
         request.setCommentId(commentId);
-        request.setWriterId(memberDetail.memberResponse().getMemberId());
+        request.setWriterId(principal.getMemberId());
         request.setSharingId(sharingId);
 
         boolean result = sharingWriteService.updateComment(request);
@@ -175,9 +175,9 @@ public class SharingWriteRestController {
             @Parameter(description = "나눔 ID", example = "100")
             @PathVariable Long sharingId,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        Long loginMemberId = memberDetail.memberResponse().getMemberId();
+        Long loginMemberId = principal.getMemberId();
         boolean result = sharingWriteService.deleteComment(commentId, sharingId, loginMemberId);
         return ResponseEntity.ok(result);
     }

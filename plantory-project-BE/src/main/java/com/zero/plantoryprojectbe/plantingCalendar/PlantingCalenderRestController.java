@@ -1,7 +1,7 @@
 package com.zero.plantoryprojectbe.plantingCalendar;
 
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.image.dto.ImageDTO;
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
 import com.zero.plantoryprojectbe.plantingCalendar.dto.DiaryRequest;
 import com.zero.plantoryprojectbe.plantingCalendar.dto.DiaryResponse;
 import com.zero.plantoryprojectbe.plantingCalendar.dto.MyPlantDiaryResponse;
@@ -43,13 +43,13 @@ public class PlantingCalenderRestController {
     })
     @GetMapping("/diary")
     public List<PlantingCalendarResponse> getPlantingDiaryCalendar(
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "조회 시작일", example = "2025-12-01T00:00:00")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @Parameter(description = "조회 종료일", example = "2025-12-31T23:59:59")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate
     ) {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         return plantingCalenderService.getDiaryCalendar(memberId, startDate, endDate);
     }
 
@@ -62,13 +62,13 @@ public class PlantingCalenderRestController {
     })
     @GetMapping("/watering")
     public List<PlantingCalendarResponse> getPlantingWateringCalendar(
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "조회 시작일", example = "2025-12-01T00:00:00")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @Parameter(description = "조회 종료일", example = "2025-12-31T23:59:59")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate
     ) {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         return plantingCalenderService.getWateringCalendar(memberId, startDate, endDate);
     }
 
@@ -80,6 +80,15 @@ public class PlantingCalenderRestController {
             @ApiResponse(responseCode = "401", description = "인증 필요"),
             @ApiResponse(responseCode = "403", description = "권한 없음")
     })
+    @PostMapping("/watering")
+    public ResponseEntity<Map<String, String>> createWatering(){
+        int result = plantingCalenderService.registerWatering(1000);
+        if (result == 0) {
+            return ResponseEntity.status(200).body(Map.of("message", "not create watering"));
+        }
+        return ResponseEntity.status(200).body(Map.of("message", "create watering success"));
+    }
+
     @PutMapping("/watering")
     public ResponseEntity<Map<String, String>> updateWateringFlag(
             @Parameter(description = "물주기 ID", example = "10")
@@ -104,9 +113,9 @@ public class PlantingCalenderRestController {
     public ResponseEntity<Map<String, String>> deleteWatering(
             @Parameter(description = "내 식물 ID", example = "5")
             @RequestParam Long myplantId,
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         int result = plantingCalenderService.removePlantWatering(myplantId, memberId);
         if (result == 1) {
             return ResponseEntity.status(200).body(Map.of("message", "watering delete success"));
@@ -167,9 +176,9 @@ public class PlantingCalenderRestController {
             @ModelAttribute DiaryRequest request,
             @Parameter(description = "업로드 파일 목록", required = false)
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) throws IOException {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         if (plantingCalenderService.registerDiary(request, files, memberId) == 0)
             return ResponseEntity.status(400).body(Map.of("message", "diary register fail"));
         return ResponseEntity.status(200).body(Map.of("message", "diary create success"));
@@ -184,9 +193,9 @@ public class PlantingCalenderRestController {
     })
     @GetMapping("/diary/myplant")
     public List<MyPlantDiaryResponse> getMyPlant(
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         return plantingCalenderService.getMyPlant(memberId);
     }
 }

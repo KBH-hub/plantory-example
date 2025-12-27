@@ -48,4 +48,10 @@ class NoticeMapperTest {
     void removeAllNotice() {
         log.info("삭제 결과 = {}", mapper.deleteAllNotice(4L));
     }
+
+    @Test
+    @DisplayName("물주기 알림 중복 확인")
+    void existsTodayWateringNotice(){
+        log.info("물주기 중복 여부 = {}", mapper.existsTodayWateringNotice(1L, 1L));
+    }
 }

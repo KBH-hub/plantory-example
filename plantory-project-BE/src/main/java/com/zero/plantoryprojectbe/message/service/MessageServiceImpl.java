@@ -1,6 +1,5 @@
 package com.zero.plantoryprojectbe.message.service;
 
-import com.zero.plantoryprojectbe.message.MessageRepository;
 import com.zero.plantoryprojectbe.notice.dto.NoticeDTO;
 import com.zero.plantoryprojectbe.global.plantoryEnum.NoticeTargetType;
 import com.zero.plantoryprojectbe.message.MessageMapper;
@@ -25,7 +24,6 @@ public class MessageServiceImpl implements MessageService {
     private final MessageMapper messageMapper;
     private final NoticeService noticeService;
     private final SharingScoreService sharingScoreService;
-    private final MessageRepository messageRepository;
 
 
     @Override
@@ -99,10 +97,8 @@ public class MessageServiceImpl implements MessageService {
 
         if (message.getReceiverId().equals(viewerId)) {
             if (message.getReadFlag() == null) {
-//                messageMapper.updateReadFlag(messageId);
-                messageRepository.updateReadFlag(messageId, LocalDateTime.now());
+                messageMapper.updateReadFlag(messageId);
             }
-
         }
 
         return message;

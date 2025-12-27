@@ -1,7 +1,9 @@
 package com.zero.plantoryprojectbe.global.security.jwt;
 
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
 import com.zero.plantoryprojectbe.global.security.MemberDetailService;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
+import com.zero.plantoryprojectbe.member.Member;
+import com.zero.plantoryprojectbe.member.MemberRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -12,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Slf4j
@@ -21,6 +24,7 @@ public class TokenProvider {
 
     private final JwtProperties jwtProperties;
     private final MemberDetailService memberDetailService;
+    private final MemberRepository  memberRepository;
 
     private Key key;
 
@@ -68,22 +72,23 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
-
         Long memberId = Long.valueOf(claims.getSubject());
+        MemberPrincipal principal = memberDetailService.loadUserById(memberId);
+        Member member = memberRepository.findById(principal.getMemberId())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
 
-        MemberDetail memberDetail =
-                memberDetailService.loadUserById(memberId);
-
-        if (memberDetail.memberResponse().getStopDay() != null) {
+        LocalDateTime stopDay = member.getStopDay();
+        if (stopDay != null && stopDay.isAfter(LocalDateTime.now())) {
             throw new RuntimeException("정지된 사용자입니다.");
         }
 
         return new UsernamePasswordAuthenticationToken(
-                memberDetail,
+                principal,
                 token,
-                memberDetail.getAuthorities()
+                principal.getAuthorities()
         );
     }
+
 
     public Long getMemberId(String token) {
         Claims claims = parseClaims(token);

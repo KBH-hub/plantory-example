@@ -1,5 +1,7 @@
 package com.zero.plantoryprojectbe.global.security;
 
+import com.zero.plantoryprojectbe.member.Member;
+import com.zero.plantoryprojectbe.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -21,29 +23,31 @@ import java.time.temporal.ChronoUnit;
 public class MemberAuthenticationProvider implements AuthenticationProvider {
 
     private final MemberDetailService userDetailsService;
+    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
         String username = authentication.getName();
-        String password = authentication.getCredentials().toString();
+        String rawPassword = authentication.getCredentials().toString();
 
-        MemberDetail user;
+        MemberPrincipal principal;
         try {
-            user = (MemberDetail) userDetailsService.loadUserByUsername(username);
+            principal = (MemberPrincipal) userDetailsService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
             throw new BadCredentialsException("아이디 또는 비밀번호가 올바르지 않습니다.");
         }
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (!passwordEncoder.matches(rawPassword, principal.getPassword())) {
             throw new BadCredentialsException("아이디 또는 비밀번호가 올바르지 않습니다.");
         }
 
-        LocalDateTime stopDay = user.memberResponse().getStopDay();
+        Member member = memberRepository.findById(principal.getMemberId())
+                .orElseThrow(() -> new BadCredentialsException("아이디 또는 비밀번호가 올바르지 않습니다."));
 
+        LocalDateTime stopDay = member.getStopDay();
         if (stopDay != null) {
-
             LocalDateTime now = LocalDateTime.now();
 
             if (stopDay.isAfter(now)) {
@@ -51,23 +55,20 @@ public class MemberAuthenticationProvider implements AuthenticationProvider {
                 throw new LockedException("정지 해제까지 " + days + "일 남았습니다.");
             }
 
-            if (stopDay.isBefore(now)) {
-                userDetailsService.resetStopDay(user.memberResponse().getMemberId());
-                user.memberResponse().setStopDay(null);
+            if (stopDay.isBefore(now) || stopDay.isEqual(now)) {
+                member.resetStopDay();
             }
         }
 
-
         return new UsernamePasswordAuthenticationToken(
-                user,
-                password,
-                user.getAuthorities()
+                principal,
+                null,
+                principal.getAuthorities()
         );
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }
-

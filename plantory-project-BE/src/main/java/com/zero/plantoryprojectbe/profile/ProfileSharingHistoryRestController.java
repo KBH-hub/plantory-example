@@ -1,6 +1,6 @@
 package com.zero.plantoryprojectbe.profile;
 
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.profile.dto.ProfileSharingHistoryListRequest;
 import com.zero.plantoryprojectbe.profile.dto.ProfileSharingHistoryListResponse;
 import com.zero.plantoryprojectbe.profile.service.ProfileSharingHistoryService;
@@ -40,7 +40,7 @@ public class ProfileSharingHistoryRestController {
     })
     @GetMapping("/my")
     public List<ProfileSharingHistoryListResponse> getMySharing(
-            @AuthenticationPrincipal MemberDetail user,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "검색 키워드", example = "몬스테라")
             @RequestParam(required = false) String keyword,
             @Parameter(description = "상태", example = "OPEN")
@@ -51,7 +51,7 @@ public class ProfileSharingHistoryRestController {
             @RequestParam int limit
     ) {
         ProfileSharingHistoryListRequest request = ProfileSharingHistoryListRequest.builder()
-                .memberId(user.memberResponse().getMemberId())
+                .memberId(principal.getMemberId())
                 .keyword(keyword)
                 .status(status)
                 .offset(offset)
@@ -70,7 +70,7 @@ public class ProfileSharingHistoryRestController {
     })
     @GetMapping("/received")
     public List<ProfileSharingHistoryListResponse> getReceivedSharing(
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "검색 키워드", example = "나눔")
             @RequestParam(required = false) String keyword,
             @Parameter(description = "상태", example = "COMPLETED")
@@ -81,7 +81,7 @@ public class ProfileSharingHistoryRestController {
             @RequestParam int limit
     ) {
         ProfileSharingHistoryListRequest request = ProfileSharingHistoryListRequest.builder()
-                .memberId(memberDetail.memberResponse().getMemberId())
+                .memberId(principal.getMemberId())
                 .keyword(keyword)
                 .status(status)
                 .offset(offset)
@@ -100,9 +100,9 @@ public class ProfileSharingHistoryRestController {
     })
     @GetMapping("/counts")
     public Map<String, Integer> getProfileCounts(
-            @AuthenticationPrincipal MemberDetail user
+            @AuthenticationPrincipal MemberPrincipal user
     ) {
-        Long memberId = user.memberResponse().getMemberId();
+        Long memberId = user.getMemberId();
 
         int interest = profileSharingHistoryService.getInterestCount(memberId);
         int sharing = profileSharingHistoryService.getCompletedSharingCount(memberId);

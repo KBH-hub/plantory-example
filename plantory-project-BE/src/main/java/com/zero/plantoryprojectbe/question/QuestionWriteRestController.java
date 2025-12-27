@@ -2,7 +2,7 @@ package com.zero.plantoryprojectbe.question;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.question.dto.AnswerRequest;
 import com.zero.plantoryprojectbe.question.dto.QuestionRequest;
 import com.zero.plantoryprojectbe.question.service.QuestionWriteService;
@@ -37,9 +37,9 @@ public class QuestionWriteRestController {
             @Parameter(description = "첨부 이미지(선택)", example = "files")
             @RequestParam(value = "files", required = false) List<MultipartFile> images,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) throws IOException {
-        request.setMemberId(memberDetail.memberResponse().getMemberId());
+        request.setMemberId(principal.getMemberId());
         Long questionId = questionWriteService.registerQuestion(request, images);
         return ResponseEntity.ok(questionId);
     }
@@ -57,11 +57,11 @@ public class QuestionWriteRestController {
             @Parameter(description = "추가 이미지(선택)", example = "files")
             @RequestParam(value = "files", required = false) List<MultipartFile> newImages,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) throws IOException {
 
         request.setQuestionId(questionId);
-        Long loginMemberId = memberDetail.memberResponse().getMemberId();
+        Long loginMemberId = principal.getMemberId();
         request.setMemberId(loginMemberId);
 
         if (request.getDeletedImageIds() != null && !request.getDeletedImageIds().isBlank()) {
@@ -83,9 +83,9 @@ public class QuestionWriteRestController {
             @Parameter(description = "질문 ID", example = "100")
             @PathVariable Long questionId,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         boolean result = questionWriteService.deleteQuestion(questionId, memberId);
         return ResponseEntity.ok(result);
     }
@@ -100,10 +100,10 @@ public class QuestionWriteRestController {
             @PathVariable Long questionId,
             @RequestBody AnswerRequest request,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
         request.setQuestionId(questionId);
-        request.setWriterId(memberDetail.memberResponse().getMemberId());
+        request.setWriterId(principal.getMemberId());
         boolean result = questionWriteService.addAnswer(request);
         return ResponseEntity.ok(result);
     }
@@ -118,10 +118,10 @@ public class QuestionWriteRestController {
             @PathVariable Long answerId,
             @RequestBody AnswerRequest request,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
         request.setAnswerId(answerId);
-        Long loginId = memberDetail.memberResponse().getMemberId();
+        Long loginId = principal.getMemberId();
         request.setWriterId(loginId);
         boolean result = questionWriteService.updateAnswer(request, loginId);
         return ResponseEntity.ok(result);
@@ -138,9 +138,9 @@ public class QuestionWriteRestController {
             @Parameter(description = "삭제 요청 바디", example = "answerId/writerId는 서버에서 세팅")
             @RequestBody AnswerRequest request,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        Long loginId = memberDetail.memberResponse().getMemberId();
+        Long loginId = principal.getMemberId();
         request.setAnswerId(answerId);
         request.setWriterId(loginId);
         boolean result = questionWriteService.deleteAnswer(request, loginId);

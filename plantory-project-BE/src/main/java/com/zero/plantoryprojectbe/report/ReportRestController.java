@@ -1,6 +1,6 @@
 package com.zero.plantoryprojectbe.report;
 
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.report.dto.NameListResponse;
 import com.zero.plantoryprojectbe.report.dto.ReportRequest;
 import com.zero.plantoryprojectbe.report.service.ReportService;
@@ -35,9 +35,9 @@ public class ReportRestController {
             @Parameter(description = "검색 닉네임", example = "식물집사")
             @RequestParam String nickname,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        Long viewerId = memberDetail.memberResponse().getMemberId();
+        Long viewerId = principal.getMemberId();
         return ResponseEntity.ok().body(reportService.getUsersIdByNickname(nickname, viewerId));
     }
 
@@ -52,10 +52,10 @@ public class ReportRestController {
             @Parameter(description = "첨부 이미지(선택)", example = "files")
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
             @Parameter(hidden = true)
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) throws IOException {
 
-        Long repoterId = memberDetail.memberResponse().getMemberId();
+        Long repoterId = principal.getMemberId();
         request.setReporterId(repoterId);
 
         int saved = reportService.registerReport(request, files);

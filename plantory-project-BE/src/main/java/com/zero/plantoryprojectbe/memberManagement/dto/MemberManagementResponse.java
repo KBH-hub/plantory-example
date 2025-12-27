@@ -1,6 +1,6 @@
 package com.zero.plantoryprojectbe.memberManagement.dto;
 
-import com.zero.plantoryprojectbe.global.plantoryEnum.Role;
+import com.zero.plantoryprojectbe.member.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,7 +56,7 @@ public class MemberManagementResponse {
     private LocalDateTime createdAt;
 
     @Schema(description = "알림 수신 여부", example = "1/0이면 on/off")
-    private Integer noticeEnabled;
+    private Boolean noticeEnabled;
 
     @Schema(description = "전체 회원 수", example = "120")
     private Integer totalCount;

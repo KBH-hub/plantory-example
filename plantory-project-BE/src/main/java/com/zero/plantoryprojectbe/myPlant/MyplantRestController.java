@@ -1,6 +1,6 @@
 package com.zero.plantoryprojectbe.myPlant;
 
-import com.zero.plantoryprojectbe.global.security.MemberDetail;
+import com.zero.plantoryprojectbe.global.security.MemberPrincipal;
 import com.zero.plantoryprojectbe.myPlant.dto.MyPlantRequest;
 import com.zero.plantoryprojectbe.myPlant.dto.MyPlantResponse;
 import com.zero.plantoryprojectbe.myPlant.service.MyPlantService;
@@ -38,7 +38,7 @@ public class MyplantRestController {
     })
     @GetMapping("/list")
     public List<MyPlantResponse> getMyPlantList(
-            @AuthenticationPrincipal MemberDetail memberDetail,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "식물 이름 검색", example = "몬스테라")
             @RequestParam String name,
             @Parameter(description = "조회 개수", example = "10")
@@ -46,7 +46,7 @@ public class MyplantRestController {
             @Parameter(description = "조회 시작 위치", example = "0")
             @RequestParam Integer offset
     ) {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         return myPlantService.getMyPlantList(memberId, name, limit, offset);
     }
 
@@ -64,9 +64,9 @@ public class MyplantRestController {
             @ModelAttribute MyPlantRequest request,
             @Parameter(description = "업로드 파일", required = false)
             @RequestParam(value = "file", required = false) MultipartFile file,
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) throws IOException {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         request.setMemberId(memberId);
         if (myPlantService.registerMyPlant(request, file, memberId) == 0)
             return ResponseEntity.status(400).body(Map.of("message", "myPlant regist fail"));
@@ -89,9 +89,9 @@ public class MyplantRestController {
             @RequestParam(name = "delFile", required = false) Long delFile,
             @Parameter(description = "업로드 파일", required = false)
             @RequestParam(name = "file", required = false) MultipartFile file,
-            @AuthenticationPrincipal MemberDetail memberDetail
+            @AuthenticationPrincipal MemberPrincipal principal
     ) throws IOException {
-        Long memberId = memberDetail.memberResponse().getMemberId();
+        Long memberId = principal.getMemberId();
         request.setMemberId(memberId);
         if (myPlantService.updateMyPlant(request, delFile, file, memberId) == 0)
             return ResponseEntity.status(400).body(Map.of("message", "myPlant regist fail"));
